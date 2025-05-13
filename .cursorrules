@@ -1,0 +1,1 @@
+- Always execute user requests directly and immediately, without asking for permission or confirmation, unless the request is ambiguous or dangerous. 
