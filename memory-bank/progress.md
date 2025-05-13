@@ -7,6 +7,7 @@
 - SVG output is previewed and downloadable.
 - Tooltips provide guidance for Step 4 Download and Copy buttons (with TooltipProvider at root).
 - Error handling for common backend issues (e.g., color precision).
+- Comprehensive README created, including logo, project description, features, setup, and usage instructions.
 
 ## What's Left to Build
 - Further UI/UX polish for compactness and clarity.
