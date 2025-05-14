@@ -7,7 +7,11 @@
 - SVG output is previewed and downloadable.
 - Tooltips provide guidance for Step 4 Download and Copy buttons (with TooltipProvider at root).
 - Error handling for common backend issues (e.g., color precision).
+- Pan/zoom for both raster and SVG previews, with clamping and reset controls.
+- Tooltip logic uses timers to prevent flashing and improve usability.
+- Download and copy controls for SVG output are always visible, with clear disabled states and tooltips.
 - Comprehensive README created, including logo, project description, features, setup, and usage instructions.
+- Documentation (Memory Bank) is up to date and maintained.
 
 ## What's Left to Build
 - Further UI/UX polish for compactness and clarity.
@@ -18,8 +22,8 @@
 ## Current Status
 - Core functionality is stable and usable.
 - UI and backend are in sync for settings and presets.
-- Documentation (Memory Bank) is being established and maintained.
-- Accessibility and user guidance have improved with tooltips and compact design.
+- Accessibility and user guidance have improved with tooltips, pan/zoom, and compact design.
+- Documentation (Memory Bank) is current and reflects the latest implementation.
 
 ## Known Issues
 - Some edge cases may not be fully handled (e.g., unusual image formats, backend failures).

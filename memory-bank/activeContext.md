@@ -6,6 +6,8 @@
 - Keeping frontend and backend settings/presets in sync.
 - Improving accessibility and user guidance with tooltips and compact design.
 - Ensuring pan/zoom features work consistently for both raster and SVG previews.
+- Implementing robust tooltip logic to prevent flashing and improve UX.
+- Providing clear download/copy guidance for SVG output.
 
 ## Recent Changes
 - UI reorganized into clear, compact step-by-step cards (Upload, Preset, Convert, Output, Download).
@@ -18,6 +20,9 @@
 - Error handling improved for color precision and backend selection.
 - Logo and layout adjustments for a more professional look.
 - SVG Output zoom (Ctrl/Cmd + scroll) is now robust: the app ensures a viewBox is always set on SVG load, enabling zoom for all SVGs regardless of original markup.
+- Pan/zoom implemented for both raster and SVG previews, with clamping and reset controls.
+- Tooltip logic improved to use timers for show/hide, preventing flashing and improving usability.
+- Download and copy buttons for SVG output are always visible, with clear disabled states and tooltips.
 
 ## Next Steps
 - Further UI/UX refinements for compactness and clarity.
@@ -30,4 +35,6 @@
 - Color precision is clamped to [1,8] for VTracer.
 - Step-by-step card layout is the standard for the UI.
 - Radix UI Select and Tooltip are the standard for dropdowns and tooltips.
-- Always ensure SVG Output has a viewBox for zooming support. 
+- Always ensure SVG Output has a viewBox for zooming support.
+- Pan/zoom and tooltip logic are standard for both raster and SVG previews.
+- Download/copy controls are always present for SVG output. 

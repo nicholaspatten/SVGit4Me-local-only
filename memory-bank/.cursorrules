@@ -1,0 +1,10 @@
+# .cursorrules
+
+- Pan/zoom and tooltip logic are standard for both raster and SVG previews.
+- Download/copy controls are always present for SVG output, with clear disabled states and tooltips.
+- Tooltip logic uses timers to prevent flashing and improve usability.
+- Always ensure SVG output has a viewBox for zooming support.
+- UI is step-by-step, card-based, and compact.
+- Radix UI Select and Tooltip are standard for dropdowns and tooltips.
+- Color precision is clamped to [1,8] for VTracer.
+- Potrace is used for Black & White preset; VTracer for all others. 
