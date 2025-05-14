@@ -7,15 +7,6 @@
       ],
       "destination": "https://www.svgit4me.com/:path*",
       "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        { "type": "host", "value": "www.svgit4me.com" },
-        { "type": "protocol", "value": "http" }
-      ],
-      "destination": "https://www.svgit4me.com/:path*",
-      "permanent": true
     }
   ]
 }
