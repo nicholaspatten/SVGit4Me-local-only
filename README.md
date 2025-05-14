@@ -1,6 +1,4 @@
-# <img src="public/logo.svg" alt="SVG It 4 Me Logo" width="120" style="vertical-align:middle;" />
-
-# SVGit4Me
+# <img src="public/logo.svg" alt="SVG It 4 Me Logo" width="120" style="vertical-align:middle;" /> SVGit4Me
 
 **SVGit4Me** is a modern, user-friendly web app for converting raster images (PNG, JPG, etc.) to high-quality SVGs. It supports both color and black & white vectorization, with a professional, step-by-step UI and robust backend powered by VTracer and Potrace.
 
