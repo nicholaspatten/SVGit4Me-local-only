@@ -2,14 +2,20 @@
   "redirects": [
     {
       "source": "/:path*",
-      "destination": "https://www.svgit4me.com/:path*",
-      "permanent": true,
       "has": [
-        {
-          "type": "host",
-          "value": "svgit4me.com"
-        }
-      ]
+        { "type": "host", "value": "svgit4me.com" }
+      ],
+      "destination": "https://www.svgit4me.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "www.svgit4me.com" },
+        { "type": "protocol", "value": "http" }
+      ],
+      "destination": "https://www.svgit4me.com/:path*",
+      "permanent": true
     }
   ]
 }
