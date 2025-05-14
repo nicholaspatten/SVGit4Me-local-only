@@ -23,6 +23,7 @@
 - Pan/zoom implemented for both raster and SVG previews, with clamping and reset controls.
 - Tooltip logic improved to use timers for show/hide, preventing flashing and improving usability.
 - Download and copy buttons for SVG output are always visible, with clear disabled states and tooltips.
+- Added vercel.json to the project root. This file configures a redirect: requests to svgit4me.com are permanently redirected to www.svgit4me.com using Vercel's configuration. This ensures canonical domain usage and is now tracked as part of project configuration.
 
 ## Next Steps
 - Further UI/UX refinements for compactness and clarity.

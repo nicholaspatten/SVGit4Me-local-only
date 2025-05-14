@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "destination": "https://www.svgit4me.com/:path*",
+      "permanent": true,
+      "has": [
+        {
+          "type": "host",
+          "value": "svgit4me.com"
+        }
+      ]
+    }
+  ]
+}
