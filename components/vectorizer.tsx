@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useLayoutEffect } from "react"
 import { ImageIcon, FileUp, FileDown, Copy, ZoomIn, ZoomOut, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -397,12 +397,15 @@ export function Vectorizer() {
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
     const scale = viewBoxStart.current.w / 400; // 400px preview width
-    setSvgViewBox(stringifyViewBox({
-      x: viewBoxStart.current.x - dx * scale,
-      y: viewBoxStart.current.y - dy * scale,
-      w: viewBoxStart.current.w,
-      h: viewBoxStart.current.h,
-    }));
+    let newX = viewBoxStart.current.x - dx * scale;
+    let newY = viewBoxStart.current.y - dy * scale;
+    let w = viewBoxStart.current.w;
+    let h = viewBoxStart.current.h;
+    // Clamp so viewBox never leaves SVG bounds (assume min 0,0 and max width,height)
+    const [vb0, vb1, vbW, vbH] = svgViewBox.split(' ').map(Number);
+    newX = Math.max(0, Math.min(newX, vbW - w));
+    newY = Math.max(0, Math.min(newY, vbH - h));
+    setSvgViewBox(stringifyViewBox({ x: newX, y: newY, w, h }));
   };
   const handleSVGMouseUp = () => setIsDragging(false);
   // Zoom with Ctrl+Scroll
@@ -411,14 +414,14 @@ export function Vectorizer() {
     e.preventDefault();
     const vb = parseViewBox(svgViewBox);
     const zoom = e.deltaY < 0 ? 0.9 : 1.1;
-    const newW = vb.w * zoom;
-    const newH = vb.h * zoom;
-    setSvgViewBox(stringifyViewBox({
-      x: vb.x + (vb.w - newW) / 2,
-      y: vb.y + (vb.h - newH) / 2,
-      w: newW,
-      h: newH,
-    }));
+    let newW = clamp(vb.w * zoom, 50, vb.w); // Don't zoom in past 50x50, or out past original size
+    let newH = clamp(vb.h * zoom, 50, vb.h);
+    let newX = vb.x + (vb.w - newW) / 2;
+    let newY = vb.y + (vb.h - newH) / 2;
+    // Clamp so viewBox never leaves SVG bounds
+    newX = Math.max(0, Math.min(newX, vb.w - newW));
+    newY = Math.max(0, Math.min(newY, vb.h - newH));
+    setSvgViewBox(stringifyViewBox({ x: newX, y: newY, w: newW, h: newH }));
   };
 
   // Add state for original image pan/zoom
@@ -428,6 +431,34 @@ export function Vectorizer() {
   const imgDragStart = useRef<{ x: number; y: number } | null>(null);
   const imgOffsetStart = useRef<{ x: number; y: number } | null>(null);
 
+  // Refs for measuring container and header
+  const imgContainerRef = useRef<HTMLDivElement>(null);
+  const imgHeaderRef = useRef<HTMLHeadingElement>(null);
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  const svgHeaderRef = useRef<HTMLDivElement>(null);
+  const [imgBounds, setImgBounds] = useState({ width: 300, height: 300 });
+  const [svgBounds, setSvgBounds] = useState({ width: 300, height: 300 });
+
+  // Measure visible area for image and SVG after render
+  useLayoutEffect(() => {
+    if (imgContainerRef.current && imgHeaderRef.current) {
+      const cRect = imgContainerRef.current.getBoundingClientRect();
+      const hRect = imgHeaderRef.current.getBoundingClientRect();
+      setImgBounds({
+        width: cRect.width,
+        height: cRect.height - (hRect.bottom - cRect.top) - 16, // 16px gap below header
+      });
+    }
+    if (svgContainerRef.current && svgHeaderRef.current) {
+      const cRect = svgContainerRef.current.getBoundingClientRect();
+      const hRect = svgHeaderRef.current.getBoundingClientRect();
+      setSvgBounds({
+        width: cRect.width,
+        height: cRect.height - (hRect.bottom - cRect.top) - 16,
+      });
+    }
+  }, [pngImage, svgImage, imgScale]);
+
   // Pan/zoom handlers for original image
   const handleImgMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setImgIsDragging(true);
@@ -436,132 +467,181 @@ export function Vectorizer() {
   };
   const handleImgMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imgIsDragging || !imgDragStart.current || !imgOffsetStart.current) return;
-    setImgOffset({
-      x: imgOffsetStart.current.x + (e.clientX - imgDragStart.current.x),
-      y: imgOffsetStart.current.y + (e.clientY - imgDragStart.current.y),
-    });
+    let newX = imgOffsetStart.current.x + (e.clientX - imgDragStart.current.x);
+    let newY = imgOffsetStart.current.y + (e.clientY - imgDragStart.current.y);
+    const img = document.querySelector('img[alt="Original"]') as HTMLImageElement | null;
+    if (img) {
+      const scale = imgScale;
+      const imgW = img.naturalWidth * scale;
+      const imgH = img.naturalHeight * scale;
+      const boxW = imgBounds.width, boxH = imgBounds.height;
+      const minX = imgW < boxW ? (boxW - imgW) / 2 : boxW - imgW;
+      const maxX = imgW < boxW ? (boxW - imgW) / 2 : 0;
+      const minY = imgH < boxH ? (boxH - imgH) / 2 : boxH - imgH;
+      const maxY = imgH < boxH ? (boxH - imgH) / 2 : 0;
+      newX = clamp(newX, minX, maxX);
+      newY = clamp(newY, minY, maxY);
+    }
+    setImgOffset({ x: newX, y: newY });
   };
   const handleImgMouseUp = () => setImgIsDragging(false);
   const handleImgWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
-    setImgScale((s) => Math.max(0.1, Math.min(10, s * (e.deltaY < 0 ? 1.1 : 0.9))));
+    setImgScale((s) => {
+      let newScale = clamp(s * (e.deltaY < 0 ? 1.1 : 0.9), 0.1, 10);
+      setTimeout(() => {
+        const img = document.querySelector('img[alt="Original"]') as HTMLImageElement | null;
+        if (img) {
+          const imgW = img.naturalWidth * newScale;
+          const imgH = img.naturalHeight * newScale;
+          const boxW = imgBounds.width, boxH = imgBounds.height;
+          const minX = imgW < boxW ? (boxW - imgW) / 2 : boxW - imgW;
+          const maxX = imgW < boxW ? (boxW - imgW) / 2 : 0;
+          const minY = imgH < boxH ? (boxH - imgH) / 2 : boxH - imgH;
+          const maxY = imgH < boxH ? (boxH - imgH) / 2 : 0;
+          setImgOffset((offset) => ({
+            x: clamp(offset.x, minX, maxX),
+            y: clamp(offset.y, minY, maxY),
+          }));
+        }
+      }, 0);
+      return newScale;
+    });
   };
   const resetImgView = () => {
     setImgScale(1);
-    setImgOffset({ x: 0, y: 0 });
+    setTimeout(() => {
+      const img = document.querySelector('img[alt="Original"]') as HTMLImageElement | null;
+      if (img) {
+        const imgW = img.naturalWidth;
+        const imgH = img.naturalHeight;
+        const boxW = imgBounds.width, boxH = imgBounds.height;
+        const x = imgW < boxW ? (boxW - imgW) / 2 : 0;
+        const y = imgH < boxH ? (boxH - imgH) / 2 : 0;
+        setImgOffset({ x, y });
+      } else {
+        setImgOffset({ x: 0, y: 0 });
+      }
+    }, 0);
   };
 
   return (
     <div className="space-y-6">
       {/* Step 4: SVG Output and Original Image at the top */}
       <div className="grid md:grid-cols-2 gap-6 mb-4">
-        <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] border-dashed relative overflow-hidden">
-          {pngImage ? (
-            <>
-              <h2 className="text-base font-semibold absolute top-3 left-4 m-0">Original Image</h2>
-              <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
-                <button onClick={() => setImgScale((s) => Math.min(10, s * 1.1))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
-                <button onClick={() => setImgScale((s) => Math.max(0.1, s * 0.9))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
-                <button onClick={resetImgView} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
-              </div>
-              <div
-                className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
-                onMouseDown={handleImgMouseDown}
-                onMouseMove={handleImgMouseMove}
-                onMouseUp={handleImgMouseUp}
-                onMouseLeave={handleImgMouseUp}
-                onWheel={handleImgWheel}
-                style={{ userSelect: imgIsDragging ? 'none' : undefined }}
-              >
-                <img
-                  src={pngImage}
-                  alt="Original"
-                  className="max-w-full max-h-[300px] object-contain"
-                  draggable={false}
-                  style={{
-                    transform: `translate(${imgOffset.x}px, ${imgOffset.y}px) scale(${imgScale})`,
-                    transition: imgIsDragging ? 'none' : 'transform 0.1s',
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
-            </>
-          ) : (
-            <h2 className="text-base font-semibold mb-2 mt-2 text-center w-full">Original Image</h2>
-          )}
-        </Card>
-        <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
-          {(svgImage || isProcessing) ? (
-            <>
-              <div className="text-base font-semibold absolute top-3 left-4 m-0">SVG Output</div>
-              <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
-                <button onClick={() => setSvgViewBox(vb => {
-                  if (!vb) return vb;
-                  const { x, y, w, h } = parseViewBox(vb);
-                  const zoom = 0.9;
-                  const newW = w * zoom;
-                  const newH = h * zoom;
-                  return stringifyViewBox({
-                    x: x + (w - newW) / 2,
-                    y: y + (h - newH) / 2,
-                    w: newW,
-                    h: newH,
-                  });
-                })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
-                <button onClick={() => setSvgViewBox(vb => {
-                  if (!vb) return vb;
-                  const { x, y, w, h } = parseViewBox(vb);
-                  const zoom = 1.1;
-                  const newW = w * zoom;
-                  const newH = h * zoom;
-                  return stringifyViewBox({
-                    x: x + (w - newW) / 2,
-                    y: y + (h - newH) / 2,
-                    w: newW,
-                    h: newH,
-                  });
-                })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
-                <button onClick={() => setSvgViewBox(null)} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
-              </div>
-              {isProcessing ? (
-                <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 border-4 border-t-gray-600 border-gray-200 rounded-full animate-spin mb-4"></div>
-                  <p className="text-gray-600">Converting to SVG...</p>
+        <div className="flex flex-col items-center w-full">
+          <h2 className="text-base font-semibold mb-2 mt-2 text-center w-full">Original Image</h2>
+          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full border-dashed relative overflow-hidden">
+            {pngImage ? (
+              <>
+                <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
+                  <button onClick={() => setImgScale((s) => Math.min(10, s * 1.1))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
+                  <button onClick={() => setImgScale((s) => Math.max(0.1, s * 0.9))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
+                  <button onClick={resetImgView} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
                 </div>
-              ) : svgImage ? (
                 <div
+                  ref={imgContainerRef}
                   className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
-                  onMouseDown={handleSVGMouseDown}
-                  onMouseMove={handleSVGMouseMove}
-                  onMouseUp={handleSVGMouseUp}
-                  onMouseLeave={handleSVGMouseUp}
-                  onWheel={handleSVGWheel}
-                  style={{ userSelect: isDragging ? 'none' : undefined }}
+                  onMouseDown={handleImgMouseDown}
+                  onMouseMove={handleImgMouseMove}
+                  onMouseUp={handleImgMouseUp}
+                  onMouseLeave={handleImgMouseUp}
+                  onWheel={handleImgWheel}
+                  style={{ userSelect: imgIsDragging ? 'none' : undefined }}
                 >
                   <img
-                    src={svgImage}
-                    alt="SVG Output"
+                    src={pngImage}
+                    alt="Original"
                     className="max-w-full max-h-[300px] object-contain"
-                    onLoad={handleSVGLoad}
                     draggable={false}
-                    style={{ pointerEvents: 'none' }}
+                    style={{
+                      transform: `translate(${imgOffset.x}px, ${imgOffset.y}px) scale(${imgScale})`,
+                      transition: imgIsDragging ? 'none' : 'transform 0.1s',
+                      pointerEvents: 'none',
+                    }}
                   />
-                  {svgViewBox && (
-                    <svg
-                      className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                      viewBox={svgViewBox}
-                      style={{ zIndex: 1 }}
-                      dangerouslySetInnerHTML={{ __html: decodeURIComponent(svgImage).replace(/^data:image\/svg\+xml;utf8,/, '').replace(/<\/?svg[^>]*>/g, '') }}
-                    />
-                  )}
                 </div>
-              ) : null}
-            </>
-          ) : (
-            <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
-          )}
-        </Card>
+              </>
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-gray-500 text-lg">Please Select an image</div>
+            )}
+          </Card>
+        </div>
+        <div className="flex flex-col items-center w-full">
+          <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
+          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden">
+            {(svgImage || isProcessing) ? (
+              <>
+                <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
+                  <button onClick={() => setSvgViewBox(vb => {
+                    if (!vb) return vb;
+                    const { x, y, w, h } = parseViewBox(vb);
+                    const zoom = 0.9;
+                    const newW = w * zoom;
+                    const newH = h * zoom;
+                    return stringifyViewBox({
+                      x: x + (w - newW) / 2,
+                      y: y + (h - newH) / 2,
+                      w: newW,
+                      h: newH,
+                    });
+                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgViewBox(vb => {
+                    if (!vb) return vb;
+                    const { x, y, w, h } = parseViewBox(vb);
+                    const zoom = 1.1;
+                    const newW = w * zoom;
+                    const newH = h * zoom;
+                    return stringifyViewBox({
+                      x: x + (w - newW) / 2,
+                      y: y + (h - newH) / 2,
+                      w: newW,
+                      h: newH,
+                    });
+                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgViewBox(null)} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
+                </div>
+                {isProcessing ? (
+                  <div className="flex flex-col items-center">
+                    <div className="w-10 h-10 border-4 border-t-gray-600 border-gray-200 rounded-full animate-spin mb-4"></div>
+                    <p className="text-gray-600">Converting to SVG...</p>
+                  </div>
+                ) : svgImage ? (
+                  <div
+                    ref={svgContainerRef}
+                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
+                    onMouseDown={handleSVGMouseDown}
+                    onMouseMove={handleSVGMouseMove}
+                    onMouseUp={handleSVGMouseUp}
+                    onMouseLeave={handleSVGMouseUp}
+                    onWheel={handleSVGWheel}
+                    style={{ userSelect: isDragging ? 'none' : undefined }}
+                  >
+                    <img
+                      src={svgImage}
+                      alt="SVG Output"
+                      className="max-w-full max-h-[300px] object-contain"
+                      onLoad={handleSVGLoad}
+                      draggable={false}
+                      style={{ pointerEvents: 'none' }}
+                    />
+                    {svgViewBox && (
+                      <svg
+                        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                        viewBox={svgViewBox}
+                        style={{ zIndex: 1 }}
+                        dangerouslySetInnerHTML={{ __html: decodeURIComponent(svgImage).replace(/^data:image\/svg\+xml;utf8,/, '').replace(/<\/?svg[^>]*>/g, '') }}
+                      />
+                    )}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div className="flex items-center justify-center w-full h-full text-gray-500 text-lg">Download or copy the SVG paths</div>
+            )}
+          </Card>
+        </div>
       </div>
       {/* Steps 1-4 in a row, now below the image/result cards, with wider container */}
       <div className="w-[710px] mx-auto">
@@ -581,7 +661,7 @@ export function Vectorizer() {
               onClick={() => fileInputRef.current?.click()}
               className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
             >
-              Upload
+              Select
             </Button>
             {error && <p className="text-red-500 ml-2 text-sm">{error}</p>}
           </Card>
@@ -785,4 +865,9 @@ export function Vectorizer() {
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   )
+}
+
+// Helper to clamp a value between min and max
+function clamp(val: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, val));
 }
