@@ -77,10 +77,22 @@ export async function POST(request: NextRequest) {
       });
       await fs.unlink(pgmPath);
     } else {
+      // Preprocess the image to ensure exact dimensions and remove any padding
+      const processedPath = path.join(tempDir, `${id}_processed.png`);
+      await new Promise((resolve, reject) => {
+        exec(
+          `magick "${inputPath}" -trim +repage -background white -gravity center "${processedPath}"`,
+          (error, stdout, stderr) => {
+            if (error) reject(stderr || stdout || error);
+            else resolve(true);
+          }
+        );
+      });
+
       // Use VTracer for all other presets (no fallback)
       const vtracerCmd = [
         "vtracer",
-        `--input "${inputPath}"`,
+        `--input "${processedPath}"`,
         `--output "${outputPath}"`,
         `--colormode ${colorMode}`,
         `--color_precision ${colorPrecision}`,
@@ -165,24 +177,23 @@ export async function POST(request: NextRequest) {
         console.error("Could not get image dimensions:", error);
       }
       
-      // Remove any background/border elements that might be causing black lines
-      // Remove all rect elements that might be backgrounds or borders
-      svg = svg.replace(/<rect[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*><\/rect>/g, '');
+      // Remove only black border lines that might be artifacts
+      svg = svg.replace(/<rect[^>]*fill="black"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000"[^>]*\/>/g, '');
       
-      // Remove any path elements with stroke that might be borders
-      svg = svg.replace(/<path[^>]*stroke="black"[^>]*\/>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="black"[^>]*><\/path>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="#000"[^>]*\/>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="#000"[^>]*><\/path>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="#000000"[^>]*\/>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="#000000"[^>]*><\/path>/g, '');
-      
-      console.log("After black line removal and dimension fix");
+      console.log("After dimension fix and black border removal");
     }
 
     // Clean up temp files
     await fs.unlink(inputPath);
+    if (preset !== "bw") {
+      try {
+        await fs.unlink(processedPath);
+      } catch (e) {
+        // File might not exist, ignore
+      }
+    }
     await fs.unlink(outputPath);
 
     return new NextResponse(svg, {
