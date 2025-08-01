@@ -535,7 +535,7 @@ export function Vectorizer() {
         </div>
         <div className="flex flex-col items-center w-full">
           <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
-          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden border-0 shadow-none">
+          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden">
                             {(svgImage || isProcessing) ? (
               <>
                 <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
@@ -554,25 +554,25 @@ export function Vectorizer() {
                 ) : svgImage ? (
                   <div
                     ref={svgContainerRef}
-                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab border-0"
+                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
                     onMouseDown={handleSVGMouseDown}
                     onMouseMove={handleSVGMouseMove}
                     onMouseUp={handleSVGMouseUp}
                     onMouseLeave={handleSVGMouseUp}
                     onWheel={handleSVGWheel}
-                    style={{ userSelect: isDragging ? 'none' : undefined }}
+                    style={{ 
+                      userSelect: isDragging ? 'none' : undefined,
+                      backgroundColor: 'lightblue' // Debug: add background to see the container bounds
+                    }}
                   >
-                    <img
-                      src={svgImage}
-                      alt="SVG Output"
-                      className="max-w-full max-h-[300px] object-contain border-0 outline-none"
-                      draggable={false}
+                    <object
+                      data={svgImage}
+                      type="image/svg+xml"
+                      className="max-w-full max-h-[300px]"
                       style={{ 
                         pointerEvents: 'none',
                         transform: `translate(${svgOffset.x}px, ${svgOffset.y}px) scale(${svgScale})`,
-                        transformOrigin: 'center',
-                        border: 'none',
-                        outline: 'none'
+                        transformOrigin: 'center'
                       }}
                     />
                   </div>
