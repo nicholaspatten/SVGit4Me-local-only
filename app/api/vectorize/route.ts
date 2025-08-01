@@ -114,7 +114,10 @@ export async function POST(request: NextRequest) {
     let svg = await fs.readFile(outputPath, "utf8");
 
     // Debug: Log the SVG content to see what's causing the black lines
-    console.log("Original SVG content:", svg);
+    console.log("Original SVG content first 500 chars:", svg.substring(0, 500));
+    console.log("SVG content includes rect:", svg.includes('<rect'));
+    console.log("SVG content includes background:", svg.includes('background'));
+    console.log("SVG content includes stroke:", svg.includes('stroke'));
 
     // Post-processing to fix viewBox and remove black lines
     if (preset !== "bw") {
@@ -131,20 +134,51 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Remove any black border elements that might be causing the lines
-      // Look for rect elements with black fill that are likely borders
-      svg = svg.replace(/<rect[^>]*fill="black"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="black"[^>]*><\/rect>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*><\/rect>/g, '');
+      // Get original image dimensions to ensure SVG matches
+      const getImageDimensions = async (imagePath) => {
+        return new Promise((resolve, reject) => {
+          exec(
+            `magick identify -format "%w %h" "${imagePath}"`,
+            (error, stdout, stderr) => {
+              if (error) {
+                reject(error);
+              } else {
+                const [width, height] = stdout.trim().split(' ').map(Number);
+                resolve({ width, height });
+              }
+            }
+          );
+        });
+      };
       
-      // Also remove any rect elements with very thin width/height that might be lines
-      svg = svg.replace(/<rect[^>]*width="1"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*width="1"[^>]*><\/rect>/g, '');
-      svg = svg.replace(/<rect[^>]*height="1"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*height="1"[^>]*><\/rect>/g, '');
+      try {
+        const { width, height } = await getImageDimensions(inputPath);
+        console.log("Original image dimensions:", width, "x", height);
+        
+        // Fix SVG dimensions to match original image
+        svg = svg.replace(/width="[^"]*"/, `width="${width}"`);
+        svg = svg.replace(/height="[^"]*"/, `height="${height}"`);
+        svg = svg.replace(/viewBox="[^"]*"/, `viewBox="0 0 ${width} ${height}"`);
+        
+        console.log("Fixed SVG dimensions to match original image");
+      } catch (error) {
+        console.error("Could not get image dimensions:", error);
+      }
       
-      console.log("After black line removal:", svg);
+      // Remove any background/border elements that might be causing black lines
+      // Remove all rect elements that might be backgrounds or borders
+      svg = svg.replace(/<rect[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*><\/rect>/g, '');
+      
+      // Remove any path elements with stroke that might be borders
+      svg = svg.replace(/<path[^>]*stroke="black"[^>]*\/>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="black"[^>]*><\/path>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="#000"[^>]*\/>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="#000"[^>]*><\/path>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="#000000"[^>]*\/>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="#000000"[^>]*><\/path>/g, '');
+      
+      console.log("After black line removal and dimension fix");
     }
 
     // Clean up temp files
