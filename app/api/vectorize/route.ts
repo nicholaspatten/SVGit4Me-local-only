@@ -113,6 +113,23 @@ export async function POST(request: NextRequest) {
     // Read SVG output
     let svg = await fs.readFile(outputPath, "utf8");
 
+    // Post-process SVG to remove any background elements that might cause black lines
+    if (preset !== "bw") {
+      // Remove any rect elements that might be background
+      svg = svg.replace(/<rect[^>]*fill="[^"]*"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="[^"]*"[^>]*><\/rect>/g, '');
+      
+      // Remove any background-related elements
+      svg = svg.replace(/<rect[^>]*style="[^"]*background[^"]*"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*style="[^"]*background[^"]*"[^>]*><\/rect>/g, '');
+      
+      // Remove any elements with black fill that might be borders
+      svg = svg.replace(/<rect[^>]*fill="black"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="black"[^>]*><\/rect>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*><\/rect>/g, '');
+    }
+
     // Clean up temp files
     await fs.unlink(inputPath);
     await fs.unlink(outputPath);
