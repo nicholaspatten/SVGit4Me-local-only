@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     // Debug: Log the SVG content to see what's causing the black lines
     console.log("Original SVG content:", svg);
 
-    // Simple post-processing to fix viewBox if needed
+    // Post-processing to fix viewBox and remove black lines
     if (preset !== "bw") {
       const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
       if (viewBoxMatch) {
@@ -130,6 +130,21 @@ export async function POST(request: NextRequest) {
           console.log("Fixed viewBox to:", newViewBox);
         }
       }
+      
+      // Remove any black border elements that might be causing the lines
+      // Look for rect elements with black fill that are likely borders
+      svg = svg.replace(/<rect[^>]*fill="black"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="black"[^>]*><\/rect>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*><\/rect>/g, '');
+      
+      // Also remove any rect elements with very thin width/height that might be lines
+      svg = svg.replace(/<rect[^>]*width="1"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*width="1"[^>]*><\/rect>/g, '');
+      svg = svg.replace(/<rect[^>]*height="1"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*height="1"[^>]*><\/rect>/g, '');
+      
+      console.log("After black line removal:", svg);
     }
 
     // Clean up temp files
