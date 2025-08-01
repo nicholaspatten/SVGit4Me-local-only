@@ -351,11 +351,12 @@ export function Vectorizer() {
     )
   }
 
-  // SVG pan/zoom state
-  const [svgViewBox, setSvgViewBox] = useState<string | null>(null);
+  // SVG pan/zoom state - use scale like the left side
+  const [svgScale, setSvgScale] = useState(1);
+  const [svgOffset, setSvgOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef<{x: number, y: number} | null>(null);
-  const viewBoxStart = useRef<{x: number, y: number, w: number, h: number} | null>(null);
+  const offsetStart = useRef<{x: number, y: number} | null>(null);
 
   // Helper to parse and stringify viewBox
   function parseViewBox(vb: string) {
@@ -366,67 +367,26 @@ export function Vectorizer() {
     return `${x} ${y} ${w} ${h}`;
   }
 
-  // Set initial viewBox on SVG load
-  const handleSVGLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    const svg = e.currentTarget;
-    if (svgImage) {
-      const decoded = decodeURIComponent(svgImage);
-      const match = decoded.match(/viewBox="([0-9.\- ]+)"/);
-      if (match) {
-        const viewBox = match[1];
-        // Fix viewBox to remove any negative values or padding
-        const [x, y, w, h] = viewBox.split(' ').map(Number);
-        // Ensure viewBox starts at 0,0 and has proper dimensions
-        const fixedViewBox = `0 0 ${w} ${h}`;
-        setSvgViewBox(fixedViewBox);
-      } else {
-        // Try to extract width and height
-        const widthMatch = decoded.match(/width="([0-9.]+)"/);
-        const heightMatch = decoded.match(/height="([0-9.]+)"/);
-        if (widthMatch && heightMatch) {
-          setSvgViewBox(`0 0 ${widthMatch[1]} ${heightMatch[1]}`);
-        }
-      }
-    }
-  };
+
 
   // Mouse events for panning
   const handleSVGMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!svgViewBox) return;
     setIsDragging(true);
     dragStart.current = {x: e.clientX, y: e.clientY};
-    viewBoxStart.current = parseViewBox(svgViewBox);
+    offsetStart.current = { ...svgOffset };
   };
   const handleSVGMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging || !svgViewBox || !dragStart.current || !viewBoxStart.current) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    const scale = viewBoxStart.current.w / 400; // 400px preview width
-    let newX = viewBoxStart.current.x - dx * scale;
-    let newY = viewBoxStart.current.y - dy * scale;
-    let w = viewBoxStart.current.w;
-    let h = viewBoxStart.current.h;
-    // Clamp so viewBox never leaves SVG bounds (assume min 0,0 and max width,height)
-    const [vb0, vb1, vbW, vbH] = svgViewBox.split(' ').map(Number);
-    newX = Math.max(0, Math.min(newX, vbW - w));
-    newY = Math.max(0, Math.min(newY, vbH - h));
-    setSvgViewBox(stringifyViewBox({ x: newX, y: newY, w, h }));
+    if (!isDragging || !dragStart.current || !offsetStart.current) return;
+    let newX = offsetStart.current.x + (e.clientX - dragStart.current.x);
+    let newY = offsetStart.current.y + (e.clientY - dragStart.current.y);
+    setSvgOffset({ x: newX, y: newY });
   };
   const handleSVGMouseUp = () => setIsDragging(false);
   // Zoom with Ctrl+Scroll
   const handleSVGWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (!svgViewBox || (!e.ctrlKey && !e.metaKey)) return;
+    if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
-    const vb = parseViewBox(svgViewBox);
-    const zoom = e.deltaY < 0 ? 0.9 : 1.1;
-    let newW = clamp(vb.w * zoom, 50, vb.w); // Don't zoom in past 50x50, or out past original size
-    let newH = clamp(vb.h * zoom, 50, vb.h);
-    let newX = vb.x + (vb.w - newW) / 2;
-    let newY = vb.y + (vb.h - newH) / 2;
-    // Clamp so viewBox never leaves SVG bounds
-    newX = Math.max(0, Math.min(newX, vb.w - newW));
-    newY = Math.max(0, Math.min(newY, vb.h - newH));
-    setSvgViewBox(stringifyViewBox({ x: newX, y: newY, w: newW, h: newH }));
+    setSvgScale((s) => clamp(s * (e.deltaY < 0 ? 1.1 : 0.9), 0.1, 10));
   };
 
   // Add state for original image pan/zoom
@@ -579,33 +539,12 @@ export function Vectorizer() {
                             {(svgImage || isProcessing) ? (
               <>
                 <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
-                  <button onClick={() => setSvgViewBox(vb => {
-                    if (!vb) return vb;
-                    const { x, y, w, h } = parseViewBox(vb);
-                    const zoom = 0.9;
-                    const newW = w * zoom;
-                    const newH = h * zoom;
-                    return stringifyViewBox({
-                      x: x + (w - newW) / 2,
-                      y: y + (h - newH) / 2,
-                      w: newW,
-                      h: newH,
-                    });
-                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
-                  <button onClick={() => setSvgViewBox(vb => {
-                    if (!vb) return vb;
-                    const { x, y, w, h } = parseViewBox(vb);
-                    const zoom = 1.1;
-                    const newW = w * zoom;
-                    const newH = h * zoom;
-                    return stringifyViewBox({
-                      x: x + (w - newW) / 2,
-                      y: y + (h - newH) / 2,
-                      w: newW,
-                      h: newH,
-                    });
-                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
-                  <button onClick={() => setSvgViewBox(null)} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgScale(s => clamp(s * 1.1, 0.1, 10))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgScale(s => clamp(s * 0.9, 0.1, 10))} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
+                  <button onClick={() => {
+                    setSvgScale(1);
+                    setSvgOffset({ x: 0, y: 0 });
+                  }} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
                 </div>
                 {isProcessing ? (
                   <div className="flex flex-col items-center">
@@ -627,18 +566,13 @@ export function Vectorizer() {
                       src={svgImage}
                       alt="SVG Output"
                       className="max-w-full max-h-[300px] object-contain"
-                      onLoad={handleSVGLoad}
                       draggable={false}
-                      style={{ pointerEvents: 'none' }}
+                      style={{ 
+                        pointerEvents: 'none',
+                        transform: `translate(${svgOffset.x}px, ${svgOffset.y}px) scale(${svgScale})`,
+                        transformOrigin: 'center'
+                      }}
                     />
-                    {svgViewBox && (
-                      <svg
-                        className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                        viewBox={svgViewBox}
-                        style={{ zIndex: 1 }}
-                        dangerouslySetInnerHTML={{ __html: decodeURIComponent(svgImage).replace(/^data:image\/svg\+xml;utf8,/, '').replace(/<\/?svg[^>]*>/g, '') }}
-                      />
-                    )}
                   </div>
                 ) : null}
               </>
