@@ -535,7 +535,7 @@ export function Vectorizer() {
         </div>
         <div className="flex flex-col items-center w-full">
           <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
-          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden">
+          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden border-0 shadow-none">
                             {(svgImage || isProcessing) ? (
               <>
                 <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
@@ -554,7 +554,7 @@ export function Vectorizer() {
                 ) : svgImage ? (
                   <div
                     ref={svgContainerRef}
-                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
+                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab border-0"
                     onMouseDown={handleSVGMouseDown}
                     onMouseMove={handleSVGMouseMove}
                     onMouseUp={handleSVGMouseUp}
@@ -565,12 +565,14 @@ export function Vectorizer() {
                     <img
                       src={svgImage}
                       alt="SVG Output"
-                      className="max-w-full max-h-[300px] object-contain"
+                      className="max-w-full max-h-[300px] object-contain border-0 outline-none"
                       draggable={false}
                       style={{ 
                         pointerEvents: 'none',
                         transform: `translate(${svgOffset.x}px, ${svgOffset.y}px) scale(${svgScale})`,
-                        transformOrigin: 'center'
+                        transformOrigin: 'center',
+                        border: 'none',
+                        outline: 'none'
                       }}
                     />
                   </div>
