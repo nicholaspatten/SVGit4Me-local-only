@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
 
     if (preset === "bw") {
       // Use Potrace for Black & White
-      // Flatten against white, trim, and convert to PGM
+      // Flatten against white and convert to PGM (removed -trim to preserve full image)
       const pgmPath = path.join(tempDir, `${id}.pgm`);
       await new Promise((resolve, reject) => {
         exec(
-          `convert "${inputPath}" -background white -alpha remove -alpha off -trim -colorspace Gray -depth 8 "${pgmPath}"`,
+          `convert "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -depth 8 "${pgmPath}"`,
           (error, stdout, stderr) => {
             if (error) reject(stderr || stdout || error);
             else resolve(true);
@@ -54,12 +54,21 @@ export async function POST(request: NextRequest) {
         );
       });
       // Run Potrace
+      const potraceCmd = `potrace "${pgmPath}" -s -o "${outputPath}"`;
+      console.log("Running Potrace command:", potraceCmd);
       await new Promise((resolve, reject) => {
         exec(
-          `potrace "${pgmPath}" -s -o "${outputPath}"`,
+          potraceCmd,
           (error, stdout, stderr) => {
-            if (error) reject(stderr || stdout || error);
-            else resolve(true);
+            if (error) {
+              console.error("Potrace error:", error);
+              console.error("Potrace stderr:", stderr);
+              console.error("Potrace stdout:", stdout);
+              reject(stderr || stdout || error);
+            } else {
+              console.log("Potrace completed successfully");
+              resolve(true);
+            }
           }
         );
       });
@@ -68,22 +77,30 @@ export async function POST(request: NextRequest) {
       // Use VTracer for all other presets
       const vtracerCmd = [
         "vtracer",
-        `--input \"${inputPath}\"`,
-        `--output \"${outputPath}\"`,
-        `--colormode ${colorMode}`,
-        `--color_precision ${colorPrecision}`,
-        `--mode ${mode}`,
-        `--corner_threshold ${cornerThreshold}`,
-        `--splice_threshold ${spliceThreshold}`,
-        `--filter_speckle ${filterSpeckle}`,
-        `--path_precision ${pathPrecision}`,
+        `--input=\"${inputPath}\"`,
+        `--output=\"${outputPath}\"`,
+        `--colormode=${colorMode}`,
+        `--color_precision=${colorPrecision}`,
+        `--mode=${mode}`,
+        `--corner_threshold=${cornerThreshold}`,
+        `--splice_threshold=${spliceThreshold}`,
+        `--filter_speckle=${filterSpeckle}`,
+        `--path_precision=${pathPrecision}`,
       ].join(" ");
+      console.log("Running VTracer command:", vtracerCmd);
       await new Promise((resolve, reject) => {
         exec(
           vtracerCmd,
           (error, stdout, stderr) => {
-            if (error) reject(stderr || stdout || error);
-            else resolve(true);
+            if (error) {
+              console.error("VTracer error:", error);
+              console.error("VTracer stderr:", stderr);
+              console.error("VTracer stdout:", stdout);
+              reject(stderr || stdout || error);
+            } else {
+              console.log("VTracer completed successfully");
+              resolve(true);
+            }
           }
         );
       });
