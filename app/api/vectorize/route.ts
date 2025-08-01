@@ -77,22 +77,10 @@ export async function POST(request: NextRequest) {
       });
       await fs.unlink(pgmPath);
     } else {
-      // Preprocess image to remove background before VTracer
-      const processedInputPath = path.join(tempDir, `${id}_processed.png`);
-      await new Promise((resolve, reject) => {
-        exec(
-          `magick "${inputPath}" -background transparent -alpha remove -alpha off "${processedInputPath}"`,
-          (error, stdout, stderr) => {
-            if (error) reject(stderr || stdout || error);
-            else resolve(true);
-          }
-        );
-      });
-
       // Use VTracer for all other presets (no fallback)
       const vtracerCmd = [
         "vtracer",
-        `--input "${processedInputPath}"`,
+        `--input "${inputPath}"`,
         `--output "${outputPath}"`,
         `--colormode ${colorMode}`,
         `--color_precision ${colorPrecision}`,
@@ -128,50 +116,24 @@ export async function POST(request: NextRequest) {
     // Debug: Log the SVG content to see what's causing the black lines
     console.log("Original SVG content:", svg);
 
-    // Post-process SVG to remove any background elements that might cause black lines
+    // Simple post-processing to fix viewBox if needed
     if (preset !== "bw") {
-      // Remove any rect elements that might be background
-      svg = svg.replace(/<rect[^>]*fill="[^"]*"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="[^"]*"[^>]*><\/rect>/g, '');
-      
-      // Remove any background-related elements
-      svg = svg.replace(/<rect[^>]*style="[^"]*background[^"]*"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*style="[^"]*background[^"]*"[^>]*><\/rect>/g, '');
-      
-      // Remove any elements with black fill that might be borders
-      svg = svg.replace(/<rect[^>]*fill="black"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="black"[^>]*><\/rect>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*><\/rect>/g, '');
-      
-      // Remove any elements with stroke that might be borders
-      svg = svg.replace(/<rect[^>]*stroke="[^"]*"[^>]*\/>/g, '');
-      svg = svg.replace(/<rect[^>]*stroke="[^"]*"[^>]*><\/rect>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="[^"]*"[^>]*\/>/g, '');
-      svg = svg.replace(/<path[^>]*stroke="[^"]*"[^>]*><\/path>/g, '');
-      
-      // Try to fix viewBox to remove any padding
       const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
       if (viewBoxMatch) {
         const viewBox = viewBoxMatch[1].split(' ').map(Number);
         console.log("Original viewBox:", viewBox);
         
-        // If viewBox has negative values or padding, try to fix it
+        // If viewBox has negative values, try to fix it
         if (viewBox[0] < 0 || viewBox[1] < 0) {
           const newViewBox = `0 0 ${viewBox[2]} ${viewBox[3]}`;
           svg = svg.replace(/viewBox="[^"]+"/, `viewBox="${newViewBox}"`);
           console.log("Fixed viewBox to:", newViewBox);
         }
       }
-      
-      console.log("After post-processing SVG content:", svg);
     }
 
     // Clean up temp files
     await fs.unlink(inputPath);
-    if (preset !== "bw") {
-      await fs.unlink(processedInputPath);
-    }
     await fs.unlink(outputPath);
 
     return new NextResponse(svg, {
