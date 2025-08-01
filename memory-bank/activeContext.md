@@ -24,12 +24,19 @@
 - Tooltip logic improved to use timers for show/hide, preventing flashing and improving usability.
 - Download and copy buttons for SVG output are always visible, with clear disabled states and tooltips.
 - Added vercel.json to the project root. This file configures a redirect: requests to svgit4me.com are permanently redirected to www.svgit4me.com using Vercel's configuration. This ensures canonical domain usage and is now tracked as part of project configuration.
+- **Docker containerization completed**: Created production-ready Docker setup with multi-stage build, health checks, and deployment scripts.
+- **Docker files added**: Dockerfile, .dockerignore, docker-compose.yml, deploy.sh, and health endpoint.
+- **Next.js configuration updated**: Added standalone output for optimized Docker containers.
+- **Local testing successful**: Container builds and runs correctly with 42ms startup time.
 
 ## Next Steps
 - Further UI/UX refinements for compactness and clarity.
 - Add more robust error messages and edge case handling.
 - Consider extensibility for new presets or backend engines.
 - Update documentation and Memory Bank as changes are made.
+- **Deploy Docker container to cloud platform** (Vercel, Railway, Render, etc.).
+- **Set up CI/CD pipeline** for automated Docker builds and deployments.
+- **Configure environment variables** for production deployment.
 
 ## Active Decisions
 - Potrace is used for Black & White preset; VTracer for all others.
@@ -38,4 +45,7 @@
 - Radix UI Select and Tooltip are the standard for dropdowns and tooltips.
 - Always ensure SVG Output has a viewBox for zooming support.
 - Pan/zoom and tooltip logic are standard for both raster and SVG previews.
-- Download/copy controls are always present for SVG output. 
+- Download/copy controls are always present for SVG output.
+- **Docker is the standard deployment method** with multi-stage builds for optimization.
+- **Health checks are implemented** for container monitoring and reliability.
+- **Standalone Next.js output** is used for Docker containers to reduce image size. 
