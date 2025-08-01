@@ -77,33 +77,63 @@ export async function POST(request: NextRequest) {
       // Use VTracer for all other presets
       const vtracerCmd = [
         "vtracer",
-        `--input=\"${inputPath}\"`,
-        `--output=\"${outputPath}\"`,
-        `--colormode=${colorMode}`,
-        `--color_precision=${colorPrecision}`,
-        `--mode=${mode}`,
-        `--corner_threshold=${cornerThreshold}`,
-        `--splice_threshold=${spliceThreshold}`,
-        `--filter_speckle=${filterSpeckle}`,
-        `--path_precision=${pathPrecision}`,
+        `--input "${inputPath}"`,
+        `--output "${outputPath}"`,
+        `--colormode ${colorMode}`,
+        `--color_precision ${colorPrecision}`,
+        `--mode ${mode}`,
+        `--corner_threshold ${cornerThreshold}`,
+        `--splice_threshold ${spliceThreshold}`,
+        `--filter_speckle ${filterSpeckle}`,
+        `--path_precision ${pathPrecision}`,
       ].join(" ");
       console.log("Running VTracer command:", vtracerCmd);
-      await new Promise((resolve, reject) => {
-        exec(
-          vtracerCmd,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.error("VTracer error:", error);
-              console.error("VTracer stderr:", stderr);
-              console.error("VTracer stdout:", stdout);
-              reject(stderr || stdout || error);
-            } else {
-              console.log("VTracer completed successfully");
-              resolve(true);
+      
+      try {
+        await new Promise((resolve, reject) => {
+          exec(
+            vtracerCmd,
+            (error, stdout, stderr) => {
+              if (error) {
+                console.error("VTracer error:", error);
+                console.error("VTracer stderr:", stderr);
+                console.error("VTracer stdout:", stdout);
+                reject(stderr || stdout || error);
+              } else {
+                console.log("VTracer completed successfully");
+                resolve(true);
+              }
             }
-          }
-        );
-      });
+          );
+        });
+      } catch (vtracerError) {
+        console.log("VTracer failed, falling back to Potrace with color quantization");
+        
+        // Fallback: Use Potrace with color quantization
+        const pgmPath = path.join(tempDir, `${id}_color.pgm`);
+        await new Promise((resolve, reject) => {
+          exec(
+            `convert "${inputPath}" -colors ${colorPrecision} -colorspace RGB "${pgmPath}"`,
+            (error, stdout, stderr) => {
+              if (error) reject(stderr || stdout || error);
+              else resolve(true);
+            }
+          );
+        });
+        
+        // Run Potrace on the color-quantized image
+        await new Promise((resolve, reject) => {
+          exec(
+            `potrace "${pgmPath}" -s -o "${outputPath}"`,
+            (error, stdout, stderr) => {
+              if (error) reject(stderr || stdout || error);
+              else resolve(true);
+            }
+          );
+        });
+        
+        await fs.unlink(pgmPath);
+      }
     }
 
     // Read SVG output
