@@ -7,7 +7,10 @@ RUN apk add --no-cache \
     imagemagick \
     potrace \
     curl \
-    && curl -L -o /usr/local/bin/vtracer https://github.com/visioncortex/vtracer/releases/download/0.3.0/vtracer-linux \
+    rust \
+    cargo \
+    && cargo install vtracer --version 0.6.3 \
+    && cp /root/.cargo/bin/vtracer /usr/local/bin/vtracer \
     && chmod +x /usr/local/bin/vtracer
 
 # Install dependencies only when needed
