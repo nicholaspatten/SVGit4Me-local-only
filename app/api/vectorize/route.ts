@@ -77,10 +77,22 @@ export async function POST(request: NextRequest) {
       });
       await fs.unlink(pgmPath);
     } else {
+      // Preprocess image to remove background before VTracer
+      const processedInputPath = path.join(tempDir, `${id}_processed.png`);
+      await new Promise((resolve, reject) => {
+        exec(
+          `magick "${inputPath}" -background transparent -alpha remove -alpha off "${processedInputPath}"`,
+          (error, stdout, stderr) => {
+            if (error) reject(stderr || stdout || error);
+            else resolve(true);
+          }
+        );
+      });
+
       // Use VTracer for all other presets (no fallback)
       const vtracerCmd = [
         "vtracer",
-        `--input "${inputPath}"`,
+        `--input "${processedInputPath}"`,
         `--output "${outputPath}"`,
         `--colormode ${colorMode}`,
         `--color_precision ${colorPrecision}`,
@@ -89,7 +101,6 @@ export async function POST(request: NextRequest) {
         `--splice_threshold ${spliceThreshold}`,
         `--filter_speckle ${filterSpeckle}`,
         `--path_precision ${pathPrecision}`,
-        `--transparent`,
       ].join(" ");
       console.log("Running VTracer command:", vtracerCmd);
       
@@ -158,6 +169,9 @@ export async function POST(request: NextRequest) {
 
     // Clean up temp files
     await fs.unlink(inputPath);
+    if (preset !== "bw") {
+      await fs.unlink(processedInputPath);
+    }
     await fs.unlink(outputPath);
 
     return new NextResponse(svg, {
