@@ -373,7 +373,12 @@ export function Vectorizer() {
       const decoded = decodeURIComponent(svgImage);
       const match = decoded.match(/viewBox="([0-9.\- ]+)"/);
       if (match) {
-        setSvgViewBox(match[1]);
+        const viewBox = match[1];
+        // Fix viewBox to remove any negative values or padding
+        const [x, y, w, h] = viewBox.split(' ').map(Number);
+        // Ensure viewBox starts at 0,0 and has proper dimensions
+        const fixedViewBox = `0 0 ${w} ${h}`;
+        setSvgViewBox(fixedViewBox);
       } else {
         // Try to extract width and height
         const widthMatch = decoded.match(/width="([0-9.]+)"/);
@@ -571,9 +576,37 @@ export function Vectorizer() {
         <div className="flex flex-col items-center w-full">
           <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
           <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden">
-            {(svgImage || isProcessing) ? (
+                            {(svgImage || isProcessing) ? (
               <>
-
+                <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
+                  <button onClick={() => setSvgViewBox(vb => {
+                    if (!vb) return vb;
+                    const { x, y, w, h } = parseViewBox(vb);
+                    const zoom = 0.9;
+                    const newW = w * zoom;
+                    const newH = h * zoom;
+                    return stringifyViewBox({
+                      x: x + (w - newW) / 2,
+                      y: y + (h - newH) / 2,
+                      w: newW,
+                      h: newH,
+                    });
+                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomIn className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgViewBox(vb => {
+                    if (!vb) return vb;
+                    const { x, y, w, h } = parseViewBox(vb);
+                    const zoom = 1.1;
+                    const newW = w * zoom;
+                    const newH = h * zoom;
+                    return stringifyViewBox({
+                      x: x + (w - newW) / 2,
+                      y: y + (h - newH) / 2,
+                      w: newW,
+                      h: newH,
+                    });
+                  })} className="rounded-full p-0.5 hover:bg-gray-100"><ZoomOut className="w-4 h-4" /></button>
+                  <button onClick={() => setSvgViewBox(null)} className="rounded-full p-0.5 hover:bg-gray-100"><RotateCcw className="w-4 h-4" /></button>
+                </div>
                 {isProcessing ? (
                   <div className="flex flex-col items-center">
                     <div className="w-10 h-10 border-4 border-t-gray-600 border-gray-200 rounded-full animate-spin mb-4"></div>
@@ -582,14 +615,30 @@ export function Vectorizer() {
                 ) : svgImage ? (
                   <div
                     ref={svgContainerRef}
-                    className="relative w-full h-[300px] flex items-center justify-center"
+                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
+                    onMouseDown={handleSVGMouseDown}
+                    onMouseMove={handleSVGMouseMove}
+                    onMouseUp={handleSVGMouseUp}
+                    onMouseLeave={handleSVGMouseUp}
+                    onWheel={handleSVGWheel}
+                    style={{ userSelect: isDragging ? 'none' : undefined }}
                   >
                     <img
                       src={svgImage}
                       alt="SVG Output"
                       className="max-w-full max-h-[300px] object-contain"
+                      onLoad={handleSVGLoad}
                       draggable={false}
+                      style={{ pointerEvents: 'none' }}
                     />
+                    {svgViewBox && (
+                      <svg
+                        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                        viewBox={svgViewBox}
+                        style={{ zIndex: 1 }}
+                        dangerouslySetInnerHTML={{ __html: decodeURIComponent(svgImage).replace(/^data:image\/svg\+xml;utf8,/, '').replace(/<\/?svg[^>]*>/g, '') }}
+                      />
+                    )}
                   </div>
                 ) : null}
               </>
