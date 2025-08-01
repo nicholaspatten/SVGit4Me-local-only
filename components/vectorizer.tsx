@@ -560,19 +560,19 @@ export function Vectorizer() {
                     onMouseUp={handleSVGMouseUp}
                     onMouseLeave={handleSVGMouseUp}
                     onWheel={handleSVGWheel}
-                    style={{ 
-                      userSelect: isDragging ? 'none' : undefined,
-                      backgroundColor: 'lightblue' // Debug: add background to see the container bounds
-                    }}
+                    style={{ userSelect: isDragging ? 'none' : undefined }}
                   >
-                    <object
-                      data={svgImage}
-                      type="image/svg+xml"
-                      className="max-w-full max-h-[300px]"
+                    <img
+                      src={svgImage}
+                      alt="SVG Output"
+                      className="max-w-full max-h-[300px] object-contain"
+                      draggable={false}
                       style={{ 
                         pointerEvents: 'none',
                         transform: `translate(${svgOffset.x}px, ${svgOffset.y}px) scale(${svgScale})`,
-                        transformOrigin: 'center'
+                        transformOrigin: 'center',
+                        display: 'block',
+                        margin: '0 auto'
                       }}
                     />
                   </div>
