@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
         `--splice_threshold ${spliceThreshold}`,
         `--filter_speckle ${filterSpeckle}`,
         `--path_precision ${pathPrecision}`,
+        `--transparent`,
       ].join(" ");
       console.log("Running VTracer command:", vtracerCmd);
       
@@ -113,6 +114,9 @@ export async function POST(request: NextRequest) {
     // Read SVG output
     let svg = await fs.readFile(outputPath, "utf8");
 
+    // Debug: Log the SVG content to see what's causing the black lines
+    console.log("Original SVG content:", svg);
+
     // Post-process SVG to remove any background elements that might cause black lines
     if (preset !== "bw") {
       // Remove any rect elements that might be background
@@ -128,6 +132,28 @@ export async function POST(request: NextRequest) {
       svg = svg.replace(/<rect[^>]*fill="black"[^>]*><\/rect>/g, '');
       svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*\/>/g, '');
       svg = svg.replace(/<rect[^>]*fill="#000000"[^>]*><\/rect>/g, '');
+      
+      // Remove any elements with stroke that might be borders
+      svg = svg.replace(/<rect[^>]*stroke="[^"]*"[^>]*\/>/g, '');
+      svg = svg.replace(/<rect[^>]*stroke="[^"]*"[^>]*><\/rect>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="[^"]*"[^>]*\/>/g, '');
+      svg = svg.replace(/<path[^>]*stroke="[^"]*"[^>]*><\/path>/g, '');
+      
+      // Try to fix viewBox to remove any padding
+      const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
+      if (viewBoxMatch) {
+        const viewBox = viewBoxMatch[1].split(' ').map(Number);
+        console.log("Original viewBox:", viewBox);
+        
+        // If viewBox has negative values or padding, try to fix it
+        if (viewBox[0] < 0 || viewBox[1] < 0) {
+          const newViewBox = `0 0 ${viewBox[2]} ${viewBox[3]}`;
+          svg = svg.replace(/viewBox="[^"]+"/, `viewBox="${newViewBox}"`);
+          console.log("Fixed viewBox to:", newViewBox);
+        }
+      }
+      
+      console.log("After post-processing SVG content:", svg);
     }
 
     // Clean up temp files
