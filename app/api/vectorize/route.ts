@@ -8,51 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 export const runtime = "nodejs"; // Ensure Node.js runtime
 
 // Function to post-process SVG and fix viewBox issues
-async function postProcessSVG(svg: string, inputPath: string): Promise<string> {
-  try {
-    // Get original image dimensions
-    const dimensions = await getImageDimensions(inputPath);
-    
-    // Extract current viewBox from SVG
-    const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
-    if (viewBoxMatch) {
-      const currentViewBox = viewBoxMatch[1].split(' ').map(Number);
-      
-      // If viewBox is significantly larger than image dimensions, adjust it
-      if (currentViewBox[2] > dimensions.width * 1.1 || currentViewBox[3] > dimensions.height * 1.1) {
-        // Replace viewBox with image dimensions
-        const newViewBox = `0 0 ${dimensions.width} ${dimensions.height}`;
-        svg = svg.replace(/viewBox="[^"]+"/, `viewBox="${newViewBox}"`);
-        
-        // Also update width and height attributes if they exist
-        svg = svg.replace(/width="[^"]+"/, `width="${dimensions.width}"`);
-        svg = svg.replace(/height="[^"]+"/, `height="${dimensions.height}"`);
-      }
-    }
-    
-    return svg;
-  } catch (error) {
-    console.error("Error post-processing SVG:", error);
-    return svg; // Return original if processing fails
-  }
-}
 
-// Function to get image dimensions using ImageMagick
-async function getImageDimensions(imagePath: string): Promise<{width: number, height: number}> {
-  return new Promise((resolve, reject) => {
-    exec(
-      `magick identify -format "%w %h" "${imagePath}"`,
-      (error, stdout, stderr) => {
-        if (error) {
-          reject(error);
-        } else {
-          const [width, height] = stdout.trim().split(' ').map(Number);
-          resolve({ width, height });
-        }
-      }
-    );
-  });
-}
 
 // In a real application, you would use a library like potrace
 // This is a simplified example that returns a placeholder SVG
@@ -156,9 +112,6 @@ export async function POST(request: NextRequest) {
 
     // Read SVG output
     let svg = await fs.readFile(outputPath, "utf8");
-
-    // Post-process SVG to fix viewBox and remove unwanted padding
-    svg = await postProcessSVG(svg, inputPath);
 
     // Clean up temp files
     await fs.unlink(inputPath);
