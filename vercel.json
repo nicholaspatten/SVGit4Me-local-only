@@ -1,12 +1,20 @@
 {
   "redirects": [
     {
-      "source": "/:path*",
-      "has": [
-        { "type": "host", "value": "svgit4me.com" }
-      ],
-      "destination": "https://www.svgit4me.com/:path*",
+      "source": "/",
+      "destination": "https://www.svgit4me.com",
       "permanent": true
     }
-  ]
+  ],
+  "functions": {
+    "app/api/vectorize/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "build": {
+    "env": {
+      "CANVAS_PREBUILT": "1"
+    }
+  }
+}
 }

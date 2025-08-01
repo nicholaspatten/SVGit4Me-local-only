@@ -28,15 +28,19 @@
 - **Docker files added**: Dockerfile, .dockerignore, docker-compose.yml, deploy.sh, and health endpoint.
 - **Next.js configuration updated**: Added standalone output for optimized Docker containers.
 - **Local testing successful**: Container builds and runs correctly with 42ms startup time.
+- **Vercel deployment issue identified**: Serverless functions don't support vtracer/potrace binaries, requiring Docker-based deployment for quality.
+- **Deployment strategy decided**: Use Docker-based platforms (Railway, Render, DigitalOcean) to maintain vectorization quality.
+- **DEPLOYMENT.md created**: Comprehensive guide for deploying to Docker-supporting platforms while maintaining quality.
 
 ## Next Steps
 - Further UI/UX refinements for compactness and clarity.
 - Add more robust error messages and edge case handling.
 - Consider extensibility for new presets or backend engines.
 - Update documentation and Memory Bank as changes are made.
-- **Deploy Docker container to cloud platform** (Vercel, Railway, Render, etc.).
+- **Deploy Docker container to Railway/Render** (recommended platforms for quality).
 - **Set up CI/CD pipeline** for automated Docker builds and deployments.
 - **Configure environment variables** for production deployment.
+- **Test vectorization quality** on deployed platform to ensure consistency.
 
 ## Active Decisions
 - Potrace is used for Black & White preset; VTracer for all others.
@@ -48,4 +52,6 @@
 - Download/copy controls are always present for SVG output.
 - **Docker is the standard deployment method** with multi-stage builds for optimization.
 - **Health checks are implemented** for container monitoring and reliability.
-- **Standalone Next.js output** is used for Docker containers to reduce image size. 
+- **Standalone Next.js output** is used for Docker containers to reduce image size.
+- **Quality over convenience**: Use Docker-based platforms (Railway, Render) instead of Vercel to maintain vectorization quality.
+- **Avoid WebAssembly alternatives**: Stick with native vtracer/potrace binaries for superior SVG conversion results. 
