@@ -493,11 +493,91 @@ export function Vectorizer() {
 
   return (
     <div className="space-y-6">
-      {/* Step 4: SVG Output and Original Image at the top */}
-      <div className="grid md:grid-cols-2 gap-6 mb-4">
+      {/* Steps 1-4 - Mobile: above images, Desktop: below images */}
+      <div className="block md:hidden">
+        <div className="w-full max-w-[710px] mx-auto">
+          <div className="flex flex-col gap-2 mb-4 px-4">
+            {/* Step 1: Upload */}
+            <div className="flex items-center justify-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 1:</span>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <Button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
+              >
+                Select
+              </Button>
+              {error && <p className="text-red-500 ml-2 text-sm">{error}</p>}
+            </div>
+            {/* Step 2: Presets */}
+            <div className="flex items-center justify-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 2:</span>
+              <Select value={preset} onValueChange={v => setPreset(v as keyof typeof PRESETS)}>
+                <SelectTrigger className="h-9 border border-black bg-black text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black hover:bg-gray-900 hover:text-white w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-black text-white border-black">
+                  {Object.keys(PRESETS).map((key) => (
+                    <SelectItem key={key} value={key} className="bg-black text-white data-[state=checked]:bg-gray-900 data-[state=checked]:text-white focus:bg-gray-900 focus:text-white">
+                      {key === 'bw' ? 'Black & White' : key.charAt(0).toUpperCase() + key.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Step 3: Convert */}
+            <div className="flex items-center justify-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 3:</span>
+              <Button
+                onClick={processImage}
+                disabled={!pngImage || isProcessing}
+                className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
+              >
+                {isProcessing ? "Converting..." : "Convert to SVG"}
+              </Button>
+            </div>
+            {/* Step 4: Download/Copy */}
+            <div className="flex items-center justify-center gap-2">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 4:</span>
+              <Button
+                onClick={handleDownload}
+                disabled={!svgImage}
+                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
+                aria-label="Download SVG"
+              >
+                <FileDown className="w-4 h-4" />
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!svgImage) return;
+                  const svgTextRaw = decodeURIComponent(svgImage.replace(/^data:image\/svg\+xml;utf8,/, ""));
+                  let svgOnly = svgTextRaw.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || svgTextRaw;
+                  svgOnly = svgOnly.replace(/<metadata[\s\S]*?<\/metadata>/i, "");
+                  navigator.clipboard.writeText(svgOnly);
+                }}
+                disabled={!svgImage}
+                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
+                aria-label="Copy SVG"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Images section */}
+      <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 px-4 md:px-0">
         <div className="flex flex-col items-center w-full">
           <h2 className="text-base font-semibold mb-2 mt-2 text-center w-full">Original Image</h2>
-          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full border-dashed relative overflow-hidden">
+          <Card className="p-4 md:p-6 flex flex-col items-center justify-center min-h-[300px] md:min-h-[400px] w-full border-dashed relative overflow-hidden">
             {pngImage ? (
               <>
                 <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
@@ -507,7 +587,7 @@ export function Vectorizer() {
                 </div>
                 <div
                   ref={imgContainerRef}
-                  className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
+                  className="relative w-full h-[250px] md:h-[300px] flex items-center justify-center cursor-grab"
                   onMouseDown={handleImgMouseDown}
                   onMouseMove={handleImgMouseMove}
                   onMouseUp={handleImgMouseUp}
@@ -518,7 +598,7 @@ export function Vectorizer() {
                   <img
                     src={pngImage}
                     alt="Original"
-                    className="max-w-full max-h-[300px] object-contain"
+                    className="max-w-full max-h-[250px] md:max-h-[300px] object-contain"
                     draggable={false}
                     style={{
                       transform: `translate(${imgOffset.x}px, ${imgOffset.y}px) scale(${imgScale})`,
@@ -535,7 +615,7 @@ export function Vectorizer() {
         </div>
         <div className="flex flex-col items-center w-full">
           <div className="text-base font-semibold mb-2 mt-2 text-center w-full">SVG Output</div>
-          <Card className="p-6 flex flex-col items-center justify-center min-h-[400px] w-full relative overflow-hidden">
+          <Card className="p-4 md:p-6 flex flex-col items-center justify-center min-h-[300px] md:min-h-[400px] w-full relative overflow-hidden">
                             {(svgImage || isProcessing) ? (
               <>
                 <div className="absolute top-3 right-4 flex gap-1 bg-white/80 rounded-full shadow p-0.5 z-10">
@@ -554,7 +634,7 @@ export function Vectorizer() {
                 ) : svgImage ? (
                   <div
                     ref={svgContainerRef}
-                    className="relative w-full h-[300px] flex items-center justify-center cursor-grab"
+                    className="relative w-full h-[250px] md:h-[300px] flex items-center justify-center cursor-grab"
                     onMouseDown={handleSVGMouseDown}
                     onMouseMove={handleSVGMouseMove}
                     onMouseUp={handleSVGMouseUp}
@@ -565,7 +645,7 @@ export function Vectorizer() {
                     <img
                       src={svgImage}
                       alt="SVG Output"
-                      className="max-w-full max-h-[300px] object-contain"
+                      className="max-w-full max-h-[250px] md:max-h-[300px] object-contain"
                       draggable={false}
                       style={{ 
                         pointerEvents: 'none',
@@ -584,8 +664,8 @@ export function Vectorizer() {
           </Card>
         </div>
       </div>
-      {/* Steps 1-4 in a row, now below the image/result cards, with wider container */}
-      <div className="w-[710px] mx-auto">
+      {/* Steps 1-4 in a row, now below the image/result cards, with wider container - Desktop only */}
+      <div className="hidden md:block w-[710px] mx-auto">
         <div className="flex gap-1 mb-2 justify-center">
           {/* Step 1: Upload */}
           <Card className="inline-flex items-center justify-center px-1 py-1 border-0 shadow-none">
