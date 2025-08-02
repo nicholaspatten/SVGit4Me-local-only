@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       const pgmPath = path.join(tempDir, `${id}.pgm`);
       await new Promise((resolve, reject) => {
         exec(
-          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -depth 8 "${pgmPath}"`,
+          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -auto-level -threshold 40% -depth 8 "${pgmPath}"`,
           (error, stdout, stderr) => {
             if (error) reject(stderr || stdout || error);
             else resolve(true);
