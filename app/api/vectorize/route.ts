@@ -7,6 +7,18 @@ import { v4 as uuidv4 } from "uuid";
 
 export const runtime = "nodejs"; // Ensure Node.js runtime
 
+// Add OPTIONS handler for CORS preflight
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 // Function to post-process SVG and fix viewBox issues
 
 

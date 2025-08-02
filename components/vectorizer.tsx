@@ -219,6 +219,48 @@ export function Vectorizer() {
     reader.readAsDataURL(file)
   }
 
+  // Test function for debugging mobile issues
+  const testUpload = async () => {
+    if (!pngImage) return;
+    
+    console.log("Testing upload on mobile browser");
+    setError(null);
+    
+    try {
+      // Convert base64 data URL to Blob
+      let blob: Blob;
+      const base64Data = pngImage.split(',')[1];
+      const mimeType = pngImage.split(',')[0].split(':')[1].split(';')[0];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      blob = new Blob([byteArray], { type: mimeType });
+      
+      const formData = new FormData();
+      formData.append("image", blob, "test.png");
+      
+      const response = await fetch("/api/test-upload", {
+        method: "POST",
+        body: formData,
+      });
+      
+      const result = await response.json();
+      console.log("Test upload result:", result);
+      
+      if (response.ok) {
+        setError(`Test SUCCESS: ${JSON.stringify(result, null, 2)}`);
+      } else {
+        setError(`Test FAILED: ${result.error} - ${result.details}`);
+      }
+    } catch (err) {
+      console.error("Test upload error:", err);
+      setError(`Test ERROR: ${err}`);
+    }
+  };
+
   const processImage = async () => {
     if (!pngImage) return;
 
@@ -646,13 +688,23 @@ export function Vectorizer() {
             {/* Step 3: Convert */}
             <div className="flex items-center">
               <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 3:</span>
-              <Button
-                onClick={processImage}
-                disabled={!pngImage || isProcessing}
-                className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
-              >
-                {isProcessing ? "Converting..." : "Convert to SVG"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={processImage}
+                  disabled={!pngImage || isProcessing}
+                  className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
+                >
+                  {isProcessing ? "Converting..." : "Convert to SVG"}
+                </Button>
+                {/* Temporary debug button for mobile testing */}
+                <Button
+                  onClick={testUpload}
+                  disabled={!pngImage}
+                  className="h-9 px-3 text-sm bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+                >
+                  Test
+                </Button>
+              </div>
             </div>
 
           </div>
@@ -824,13 +876,23 @@ export function Vectorizer() {
           {/* Step 3: Convert to SVG */}
           <Card className="inline-flex items-center justify-center px-1 py-1 border-0 shadow-none">
             <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 3:</span>
-            <Button
-              onClick={processImage}
-              disabled={!pngImage || isProcessing}
-              className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
-            >
-              {isProcessing ? "Converting..." : "Convert to SVG"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={processImage}
+                disabled={!pngImage || isProcessing}
+                className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
+              >
+                {isProcessing ? "Converting..." : "Convert to SVG"}
+              </Button>
+              {/* Temporary debug button for mobile testing */}
+              <Button
+                onClick={testUpload}
+                disabled={!pngImage}
+                className="h-9 px-3 text-sm bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+              >
+                Test
+              </Button>
+            </div>
           </Card>
           {/* Step 4: Download/Copy SVG (always shown, all on one line) */}
           <Card className="inline-flex items-center justify-center px-1 py-1 border-0 shadow-none">
