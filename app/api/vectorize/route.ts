@@ -27,6 +27,36 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
   console.log("API /api/vectorize called");
   try {
+    // Check if binaries are available
+    console.log("=== CHECKING BINARY AVAILABILITY ===");
+    const checkBinaries = async () => {
+      const checks = [
+        { name: 'ImageMagick', cmd: 'which magick' },
+        { name: 'Potrace', cmd: 'which potrace' },
+        { name: 'VTracer', cmd: 'which vtracer' }
+      ];
+      
+      for (const check of checks) {
+        try {
+          await new Promise((resolve, reject) => {
+            exec(check.cmd, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`${check.name} NOT FOUND:`, error.message);
+                reject(error);
+              } else {
+                console.log(`${check.name} found at:`, stdout.trim());
+                resolve(true);
+              }
+            });
+          });
+        } catch (error) {
+          console.error(`${check.name} check failed:`, error);
+        }
+      }
+    };
+    
+    await checkBinaries();
+    
     // Add headers for better mobile browser compatibility
     const headers = {
       'Access-Control-Allow-Origin': '*',
@@ -90,14 +120,25 @@ export async function POST(request: NextRequest) {
       // Use Potrace for Black & White
       // Convert to bitmap (PBM) format that Potrace expects
       const pbmPath = path.join(tempDir, `${id}.pbm`);
+      console.log("=== BLACK & WHITE PROCESSING ===");
+      console.log("Input file:", inputPath);
+      console.log("Output PBM:", pbmPath);
+      
+      const magickCmd = `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -contrast-stretch 0x15% -threshold 75% -monochrome "${pbmPath}"`;
+      console.log("ImageMagick command:", magickCmd);
+      
       await new Promise((resolve, reject) => {
-        exec(
-          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -contrast-stretch 0x15% -threshold 75% -monochrome "${pbmPath}"`,
-          (error, stdout, stderr) => {
-            if (error) reject(stderr || stdout || error);
-            else resolve(true);
+        exec(magickCmd, (error, stdout, stderr) => {
+          console.log("ImageMagick stdout:", stdout);
+          console.log("ImageMagick stderr:", stderr);
+          if (error) {
+            console.error("ImageMagick failed:", error);
+            reject(stderr || stdout || error);
+          } else {
+            console.log("ImageMagick completed successfully");
+            resolve(true);
           }
-        );
+        });
       });
       // Run Potrace
       const potraceCmd = `potrace "${pbmPath}" -s -o "${outputPath}"`;
@@ -120,16 +161,29 @@ export async function POST(request: NextRequest) {
       });
       await fs.unlink(pbmPath);
     } else {
+      console.log("=== COLOR PROCESSING WITH VTRACER ===");
+      console.log("Input file:", inputPath);
+      console.log("Preset:", preset, "ColorMode:", colorMode);
+      
       // Preprocess the image to ensure exact dimensions and remove any padding
       const processedPath = path.join(tempDir, `${id}_processed.png`);
+      console.log("Processed file:", processedPath);
+      
+      const preprocessCmd = `magick "${inputPath}" -trim +repage -background white -gravity center "${processedPath}"`;
+      console.log("ImageMagick preprocess command:", preprocessCmd);
+      
       await new Promise((resolve, reject) => {
-        exec(
-          `magick "${inputPath}" -trim +repage -background white -gravity center "${processedPath}"`,
-          (error, stdout, stderr) => {
-            if (error) reject(stderr || stdout || error);
-            else resolve(true);
+        exec(preprocessCmd, (error, stdout, stderr) => {
+          console.log("ImageMagick preprocess stdout:", stdout);
+          console.log("ImageMagick preprocess stderr:", stderr);
+          if (error) {
+            console.error("ImageMagick preprocess failed:", error);
+            reject(stderr || stdout || error);
+          } else {
+            console.log("ImageMagick preprocess completed successfully");
+            resolve(true);
           }
-        );
+        });
       });
 
       // Use VTracer for all other presets (no fallback)
@@ -148,20 +202,21 @@ export async function POST(request: NextRequest) {
       console.log("Running VTracer command:", vtracerCmd);
       
       await new Promise((resolve, reject) => {
-        exec(
-          vtracerCmd,
-          (error, stdout, stderr) => {
-            if (error) {
-              console.error("VTracer error:", error);
-              console.error("VTracer stderr:", stderr);
-              console.error("VTracer stdout:", stdout);
-              reject(stderr || stdout || error);
-            } else {
-              console.log("VTracer completed successfully");
-              resolve(true);
-            }
+        exec(vtracerCmd, (error, stdout, stderr) => {
+          console.log("VTracer stdout:", stdout);
+          console.log("VTracer stderr:", stderr);
+          if (error) {
+            console.error("VTracer failed - Error code:", error.code);
+            console.error("VTracer failed - Signal:", error.signal);
+            console.error("VTracer failed - Error:", error.message);
+            console.error("VTracer stderr:", stderr);
+            console.error("VTracer stdout:", stdout);
+            reject(stderr || stdout || error);
+          } else {
+            console.log("VTracer completed successfully");
+            resolve(true);
           }
-        );
+        });
       });
     }
 
