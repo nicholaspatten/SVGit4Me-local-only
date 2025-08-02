@@ -45,11 +45,11 @@ export async function POST(request: NextRequest) {
 
     if (preset === "bw" || colorMode === "grayscale") {
       // Use Potrace for Black & White
-      // Flatten against white and convert to PGM (removed -trim to preserve full image)
-      const pgmPath = path.join(tempDir, `${id}.pgm`);
+      // Convert to bitmap (PBM) format that Potrace expects
+      const pbmPath = path.join(tempDir, `${id}.pbm`);
       await new Promise((resolve, reject) => {
         exec(
-          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -auto-level -threshold 40% -depth 8 "${pgmPath}"`,
+          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -auto-level -threshold 60% -negate -monochrome "${pbmPath}"`,
           (error, stdout, stderr) => {
             if (error) reject(stderr || stdout || error);
             else resolve(true);
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         );
       });
       // Run Potrace
-      const potraceCmd = `potrace "${pgmPath}" -s -o "${outputPath}"`;
+      const potraceCmd = `potrace "${pbmPath}" -s -o "${outputPath}"`;
       console.log("Running Potrace command:", potraceCmd);
       await new Promise((resolve, reject) => {
         exec(
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
           }
         );
       });
-      await fs.unlink(pgmPath);
+      await fs.unlink(pbmPath);
     } else {
       // Preprocess the image to ensure exact dimensions and remove any padding
       const processedPath = path.join(tempDir, `${id}_processed.png`);
