@@ -1,40 +1,35 @@
 # <img src="public/logo.svg" alt="SVG It 4 Me Logo" width="120" style="vertical-align:middle;" />
 
-**SVGit4Me** is a **local-only** web application for converting raster images (PNG, JPG, etc.) to high-quality SVGs. Built with privacy and security in mind, it runs entirely in a Docker container on your local machine, ensuring your images never leave your computer.
+**SVGit4Me** is a **privacy-first, local-only** web application for converting raster images (PNG, JPG, etc.) to high-quality SVGs. Built with security and privacy as core principles, it runs entirely in a Docker container on your local machine, ensuring your images never leave your computer and are never uploaded to any external servers.
 
 ## 🔒 Privacy & Security First
 
-- **100% Local Processing**: All image conversion happens on your machine
-- **No Cloud Uploads**: Images are never sent to external servers
-- **Docker Containerized**: Isolated environment for secure processing
-- **Offline Capable**: Works without internet connection after initial setup
-- **No Data Collection**: Zero telemetry or user data collection
+- **🏠 100% Local Processing**: All image conversion happens on your machine - no files ever leave your computer
+- **🚫 Zero Cloud Uploads**: Images are processed locally in Docker containers, never sent to external servers
+- **🐳 Docker Containerized**: Isolated, secure environment with all dependencies included
+- **📱 Offline Capable**: Works completely offline after initial Docker setup
+- **🔒 No Data Collection**: Zero telemetry, analytics, or user data collection
+- **⚡ Browser-Based Processing**: Runs in your browser but processes locally for maximum privacy
+- **🗑️ Automatic Cleanup**: Temporary files are automatically deleted after processing
 
-## Features
-- Upload raster images and convert to SVG instantly
-- Preset system for common use cases (Photo, Logo, Lineart, Black & White, etc.)
-- Customizable vectorization options
-- Step-by-step, compact UI for clarity and ease of use
-- Download and copy SVG output
-- Pan and zoom (with Ctrl/Cmd + scroll) for both raster and SVG previews
-- Tooltips for guidance and accessibility
-- Fully responsive and accessible design
+## ✨ Features
 
-## Features
-- Upload raster images and convert to SVG instantly
-- Preset system for common use cases (Photo, Logo, Lineart, Black & White, etc.)
-- Customizable vectorization options
-- Step-by-step, compact UI for clarity and ease of use
-- Download and copy SVG output
-- Pan and zoom (with Ctrl/Cmd + scroll) for both raster and SVG previews
-- Tooltips for guidance and accessibility
-- Fully responsive and accessible design
+- **🖼️ High-Quality Conversion**: Upload raster images and convert to crisp, scalable SVGs instantly
+- **🎯 Smart Presets**: Optimized settings for Photos, Logos, Line Art, Black & White, and more
+- **⚙️ Customizable Options**: Fine-tune vectorization parameters for perfect results
+- **🎨 Dual Processing Engines**: VTracer for color images, Potrace for black & white
+- **📏 Exact Dimensions**: SVG output matches original image dimensions precisely
+- **🔍 Pan & Zoom**: Interactive preview with Ctrl/Cmd + scroll for both raster and SVG
+- **💾 Easy Export**: Download SVG files or copy paths to clipboard
+- **🎛️ Step-by-Step UI**: Clear, intuitive interface with helpful tooltips
+- **📱 Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
+- **♿ Accessibility**: Full keyboard navigation and screen reader support
 
 ## Getting Started
 
-### Option 1: Docker (Recommended - Easiest Setup)
+### Option 1: Docker (Recommended - Privacy & Security)
 
-The easiest way to run SVGit4Me is using Docker, which provides a complete isolated environment with all dependencies pre-installed.
+Docker is the recommended way to run SVGit4Me as it provides complete privacy with all processing happening in an isolated container on your local machine. No internet connection required after initial setup!
 
 #### Prerequisites
 - Docker Desktop installed on your system
@@ -102,9 +97,10 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🔧 Technical Details
 
 ### Vectorization Engines
-- **VTracer**: High-quality color vectorization
+- **VTracer**: High-quality color vectorization with superior color accuracy
 - **Potrace**: Black & white vectorization with ImageMagick preprocessing
-- **Fallback System**: Automatic fallback to Potrace if VTracer fails
+- **Image Preprocessing**: Automatic trim and optimization for perfect dimension matching
+- **Quality Assurance**: Intelligent post-processing removes artifacts while preserving content
 
 ### Security Features
 - **Container Isolation**: All processing happens in isolated Docker containers
