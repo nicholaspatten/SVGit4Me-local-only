@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       const pbmPath = path.join(tempDir, `${id}.pbm`);
       await new Promise((resolve, reject) => {
         exec(
-          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -auto-level -threshold 40% -monochrome "${pbmPath}"`,
+          `magick "${inputPath}" -background white -alpha remove -alpha off -colorspace Gray -contrast-stretch 0x15% -threshold 75% -monochrome "${pbmPath}"`,
           (error, stdout, stderr) => {
             if (error) reject(stderr || stdout || error);
             else resolve(true);
