@@ -226,22 +226,39 @@ export function Vectorizer() {
     setError(null);
 
     try {
-      // Convert base64 data URL to Blob with better Safari compatibility
+      // Convert base64 data URL to Blob with better Safari/Firefox compatibility
       let blob: Blob;
       try {
+        // Try fetch method first
         const res = await fetch(pngImage);
-        blob = await res.blob();
-      } catch (fetchError) {
-        // Fallback for Safari: manual base64 to blob conversion
-        const base64Data = pngImage.split(',')[1];
-        const mimeType = pngImage.split(',')[0].split(':')[1].split(';')[0];
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        if (!res.ok) {
+          throw new Error(`Fetch failed: ${res.status}`);
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        blob = new Blob([byteArray], { type: mimeType });
+        blob = await res.blob();
+        console.log("Successfully created blob via fetch, size:", blob.size, "type:", blob.type);
+      } catch (fetchError) {
+        console.log("Fetch method failed, trying manual conversion:", fetchError);
+        try {
+          // Fallback for Safari/Firefox: manual base64 to blob conversion
+          const base64Data = pngImage.split(',')[1];
+          const mimeType = pngImage.split(',')[0].split(':')[1].split(';')[0];
+          
+          if (!base64Data || !mimeType) {
+            throw new Error("Invalid data URL format");
+          }
+          
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          blob = new Blob([byteArray], { type: mimeType });
+          console.log("Successfully created blob via manual conversion, size:", blob.size, "type:", blob.type);
+        } catch (manualError) {
+          console.error("Both fetch and manual conversion failed:", manualError);
+          throw new Error("Failed to convert image data");
+        }
       }
 
       // Prepare FormData with better Safari compatibility
@@ -253,6 +270,12 @@ export function Vectorizer() {
         formData.append(key, String(value));
       });
       formData.append("preset", preset); // Send the current preset
+      
+      // Debug FormData
+      console.log("FormData entries:");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, typeof value === 'object' ? `File(${value.constructor.name}, ${value.size} bytes)` : value);
+      }
 
       // Call backend API with longer timeout for mobile
       const controller = new AbortController();
@@ -584,7 +607,7 @@ export function Vectorizer() {
       {/* Steps 1-4 - Mobile: above images, Desktop: below images */}
       <div className="block md:hidden">
         <div className="w-full max-w-[400px] mx-auto">
-          <div className="flex flex-col gap-2 mb-4 px-4">
+          <div className="flex flex-col gap-2 mb-4 px-4 items-center">
             {/* Step 1: Upload */}
             <div className="flex items-center">
               <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 1:</span>
@@ -727,7 +750,7 @@ export function Vectorizer() {
           </Card>
           {/* Step 4: Download/Copy - Mobile only, below SVG output */}
           <div className="block md:hidden mt-4 w-full max-w-[400px] mx-auto">
-            <div className="flex items-center gap-2 px-4">
+            <div className="flex items-center gap-2 px-4 justify-center">
               <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 4:</span>
               <Button
                 onClick={handleDownload}

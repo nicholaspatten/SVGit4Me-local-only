@@ -15,21 +15,52 @@ export const runtime = "nodejs"; // Ensure Node.js runtime
 export async function POST(request: NextRequest) {
   console.log("API /api/vectorize called");
   try {
+    // Add headers for better mobile browser compatibility
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
     const formData = await request.formData();
+    console.log("FormData received, entries:", Array.from(formData.entries()).map(([key, value]) => [key, typeof value === 'object' ? `File(${value.constructor.name})` : value]));
+    
     const file = formData.get("image") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      console.error("No file provided in formData");
+      return NextResponse.json({ error: "No file provided" }, { status: 400, headers });
     }
 
-    // Save uploaded file to a temp location
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    console.log("File info:", {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+
+    // Save uploaded file to a temp location with better mobile browser support
+    let buffer: Buffer;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+      console.log("Successfully converted file to buffer, size:", buffer.length);
+    } catch (error) {
+      console.error("Failed to convert file to arrayBuffer:", error);
+      return NextResponse.json({ error: "Failed to process uploaded file" }, { status: 400, headers });
+    }
+
     const tempDir = os.tmpdir();
     const id = uuidv4();
     const inputPath = path.join(tempDir, `${id}.png`);
     const outputPath = path.join(tempDir, `${id}.svg`);
-    await fs.writeFile(inputPath, buffer);
+    
+    try {
+      await fs.writeFile(inputPath, buffer);
+      console.log("Successfully wrote file to:", inputPath);
+    } catch (error) {
+      console.error("Failed to write file:", error);
+      return NextResponse.json({ error: "Failed to save uploaded file" }, { status: 500, headers });
+    }
 
     const preset = formData.get("preset");
     // Read settings from formData
@@ -197,10 +228,21 @@ export async function POST(request: NextRequest) {
     await fs.unlink(outputPath);
 
     return new NextResponse(svg, {
-      headers: { "Content-Type": "image/svg+xml" },
+      headers: { 
+        "Content-Type": "image/svg+xml",
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   } catch (error) {
     console.error("API ERROR:", error);
-    return NextResponse.json({ error: "Failed to process image", details: String(error) }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Failed to process image", 
+      details: String(error) 
+    }, { 
+      status: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    });
   }
 }
