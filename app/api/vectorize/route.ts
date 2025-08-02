@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const filterSpeckle = formData.get("filterSpeckle") || 2;
     const pathPrecision = formData.get("pathPrecision") || 4;
 
-    if (preset === "bw") {
+    if (preset === "bw" || colorMode === "grayscale") {
       // Use Potrace for Black & White
       // Flatten against white and convert to PGM (removed -trim to preserve full image)
       const pgmPath = path.join(tempDir, `${id}.pgm`);
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
     console.log("SVG content includes stroke:", svg.includes('stroke'));
 
     // Post-processing to fix viewBox and remove black lines
-    if (preset !== "bw") {
+    if (preset !== "bw" && colorMode !== "grayscale") {
       const viewBoxMatch = svg.match(/viewBox="([^"]+)"/);
       if (viewBoxMatch) {
         const viewBox = viewBoxMatch[1].split(' ').map(Number);
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
 
     // Clean up temp files
     await fs.unlink(inputPath);
-    if (preset !== "bw") {
+    if (preset !== "bw" && colorMode !== "grayscale") {
       try {
         await fs.unlink(processedPath);
       } catch (e) {

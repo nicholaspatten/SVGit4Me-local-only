@@ -6,13 +6,11 @@ Tired of uploading your valuable images to unknown servers for vectorization? I 
 
 **🏠 What makes it different?**
 ✅ 100% local processing - your images NEVER leave your computer
-✅ Runs in Docker containers on your machine
-✅ Works completely offline after setup
+✅ Runs in your browser
 ✅ Zero data collection or tracking
-✅ Professional-grade results using VTracer & Potrace
+✅ Professional-grade results
 
 **⚡ Why local processing matters:**
-• Your intellectual property stays private
 • No upload limits or file size restrictions  
 • No subscription fees or usage tracking
 • Works with sensitive/confidential images
@@ -20,7 +18,6 @@ Tired of uploading your valuable images to unknown servers for vectorization? I 
 
 **🎯 Perfect for:**
 • Designers working with client assets
-• Companies with strict data policies
 • Anyone who values privacy
 • Converting logos, illustrations, photos to scalable SVGs
 
@@ -29,15 +26,8 @@ Tired of uploading your valuable images to unknown servers for vectorization? I 
 The trade-off? Complete privacy and security of your creative work.
 
 **🚀 Ready to try?**
-Clone the repo, run one Docker command, and start converting images to high-quality SVGs without ever uploading a single file.
-
-GitHub: [Repository Link]
-Live Demo: Run locally with Docker
+https://www.svgit4me.com
 
 What do you think? Would you trade a few extra seconds of processing time for complete privacy and control over your images?
 
-#Privacy #WebDev #SVG #Docker #OpenSource #DataSecurity #Design #Tools
-
----
-
-*Built with Next.js, Docker, VTracer, and a privacy-first mindset. All code is open source and auditable.*
+#Privacy #WebDev #SVG #Design #Tools
