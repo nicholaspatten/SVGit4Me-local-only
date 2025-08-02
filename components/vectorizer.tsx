@@ -583,11 +583,11 @@ export function Vectorizer() {
     <div className="space-y-6">
       {/* Steps 1-4 - Mobile: above images, Desktop: below images */}
       <div className="block md:hidden">
-        <div className="w-full max-w-[710px] mx-auto">
+        <div className="w-full max-w-[400px] mx-auto">
           <div className="flex flex-col gap-2 mb-4 px-4">
             {/* Step 1: Upload */}
-            <div className="flex items-center justify-center">
-              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 1:</span>
+            <div className="flex items-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 1:</span>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -605,8 +605,8 @@ export function Vectorizer() {
               {error && <p className="text-red-500 ml-2 text-sm">{error}</p>}
             </div>
             {/* Step 2: Presets */}
-            <div className="flex items-center justify-center">
-              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 2:</span>
+            <div className="flex items-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 2:</span>
               <Select value={preset} onValueChange={v => setPreset(v as keyof typeof PRESETS)}>
                 <SelectTrigger className="h-9 border border-black bg-black text-white rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-black hover:bg-gray-900 hover:text-white w-[180px]">
                   <SelectValue />
@@ -621,8 +621,8 @@ export function Vectorizer() {
               </Select>
             </div>
             {/* Step 3: Convert */}
-            <div className="flex items-center justify-center">
-              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 3:</span>
+            <div className="flex items-center">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 3:</span>
               <Button
                 onClick={processImage}
                 disabled={!pngImage || isProcessing}
@@ -726,9 +726,9 @@ export function Vectorizer() {
             )}
           </Card>
           {/* Step 4: Download/Copy - Mobile only, below SVG output */}
-          <div className="block md:hidden mt-4 w-full">
-            <div className="flex items-center justify-center gap-2">
-              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 4:</span>
+          <div className="block md:hidden mt-4 w-full max-w-[400px] mx-auto">
+            <div className="flex items-center gap-2 px-4">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap w-16">Step 4:</span>
               <Button
                 onClick={handleDownload}
                 disabled={!svgImage}
