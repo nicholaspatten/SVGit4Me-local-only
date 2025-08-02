@@ -182,17 +182,40 @@ export function Vectorizer() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (!file.type.includes("image/")) {
-      setError("Please upload an image file")
+    // More specific file type validation for Safari
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp']
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      setError("Please upload a valid image file (PNG, JPG, GIF, WebP, BMP)")
+      return
+    }
+
+    // Check file size (limit to 10MB for mobile compatibility)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image file too large. Please use an image smaller than 10MB")
       return
     }
 
     setError(null)
     const reader = new FileReader()
+    
     reader.onload = (event) => {
-      setPngImage(event.target?.result as string)
-      setSvgImage(null)
+      try {
+        const result = event.target?.result as string
+        if (result) {
+          setPngImage(result)
+          setSvgImage(null)
+          // Clear the input to allow re-selecting the same file
+          e.target.value = ''
+        }
+      } catch (err) {
+        setError("Failed to read image file")
+      }
     }
+    
+    reader.onerror = () => {
+      setError("Failed to read image file")
+    }
+    
     reader.readAsDataURL(file)
   }
 
@@ -203,36 +226,80 @@ export function Vectorizer() {
     setError(null);
 
     try {
-      // Convert base64 data URL to Blob
-      const res = await fetch(pngImage);
-      const blob = await res.blob();
+      // Convert base64 data URL to Blob with better Safari compatibility
+      let blob: Blob;
+      try {
+        const res = await fetch(pngImage);
+        blob = await res.blob();
+      } catch (fetchError) {
+        // Fallback for Safari: manual base64 to blob conversion
+        const base64Data = pngImage.split(',')[1];
+        const mimeType = pngImage.split(',')[0].split(':')[1].split(';')[0];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        blob = new Blob([byteArray], { type: mimeType });
+      }
 
-      // Prepare FormData
+      // Prepare FormData with better Safari compatibility
       const formData = new FormData();
       formData.append("image", blob, "upload.png");
+      
       // Add all settings to FormData
       Object.entries(settings).forEach(([key, value]) => {
         formData.append(key, String(value));
       });
       formData.append("preset", preset); // Send the current preset
 
-      // Call backend API
+      // Call backend API with longer timeout for mobile
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      
       const apiRes = await fetch("/api/vectorize", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!apiRes.ok) {
-        const err = await apiRes.json();
-        setError(err.error || "Failed to convert image");
+        const contentType = apiRes.headers.get("content-type");
+        let errorMessage = "Failed to convert image";
+        
+        try {
+          if (contentType && contentType.includes("application/json")) {
+            const err = await apiRes.json();
+            errorMessage = err.error || errorMessage;
+          } else {
+            const text = await apiRes.text();
+            errorMessage = text || errorMessage;
+          }
+        } catch (parseError) {
+          console.error("Error parsing response:", parseError);
+        }
+        
+        setError(errorMessage);
         setIsProcessing(false);
         return;
       }
 
       const svgText = await apiRes.text();
       setSvgImage(`data:image/svg+xml;utf8,${encodeURIComponent(svgText)}`);
-    } catch (err) {
-      setError("Failed to process image");
+    } catch (err: any) {
+      console.error("Processing error:", err);
+      let errorMessage = "Failed to process image";
+      
+      if (err.name === 'AbortError') {
+        errorMessage = "Request timed out. Please try again.";
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     }
 
     setIsProcessing(false);
@@ -243,17 +310,38 @@ export function Vectorizer() {
     const file = e.dataTransfer.files?.[0]
     if (!file) return
 
-    if (!file.type.includes("image/")) {
-      setError("Please upload an image file")
+    // Use same validation as file input
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp']
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      setError("Please upload a valid image file (PNG, JPG, GIF, WebP, BMP)")
+      return
+    }
+
+    // Check file size (limit to 10MB for mobile compatibility)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image file too large. Please use an image smaller than 10MB")
       return
     }
 
     setError(null)
     const reader = new FileReader()
+    
     reader.onload = (event) => {
-      setPngImage(event.target?.result as string)
-      setSvgImage(null)
+      try {
+        const result = event.target?.result as string
+        if (result) {
+          setPngImage(result)
+          setSvgImage(null)
+        }
+      } catch (err) {
+        setError("Failed to read image file")
+      }
     }
+    
+    reader.onerror = () => {
+      setError("Failed to read image file")
+    }
+    
     reader.readAsDataURL(file)
   }
 
