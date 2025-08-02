@@ -876,23 +876,13 @@ export function Vectorizer() {
           {/* Step 3: Convert to SVG */}
           <Card className="inline-flex items-center justify-center px-1 py-1 border-0 shadow-none">
             <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 3:</span>
-            <div className="flex gap-2">
-              <Button
-                onClick={processImage}
-                disabled={!pngImage || isProcessing}
-                className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
-              >
-                {isProcessing ? "Converting..." : "Convert to SVG"}
-              </Button>
-              {/* Temporary debug button for mobile testing */}
-              <Button
-                onClick={testUpload}
-                disabled={!pngImage}
-                className="h-9 px-3 text-sm bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
-              >
-                Test
-              </Button>
-            </div>
+            <Button
+              onClick={processImage}
+              disabled={!pngImage || isProcessing}
+              className="h-9 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black"
+            >
+              {isProcessing ? "Converting..." : "Convert to SVG"}
+            </Button>
           </Card>
           {/* Step 4: Download/Copy SVG (always shown, all on one line) */}
           <Card className="inline-flex items-center justify-center px-1 py-1 border-0 shadow-none">
