@@ -631,32 +631,7 @@ export function Vectorizer() {
                 {isProcessing ? "Converting..." : "Convert to SVG"}
               </Button>
             </div>
-            {/* Step 4: Download/Copy */}
-            <div className="flex items-center justify-center gap-2">
-              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 4:</span>
-              <Button
-                onClick={handleDownload}
-                disabled={!svgImage}
-                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
-                aria-label="Download SVG"
-              >
-                <FileDown className="w-4 h-4" />
-              </Button>
-              <Button
-                onClick={() => {
-                  if (!svgImage) return;
-                  const svgTextRaw = decodeURIComponent(svgImage.replace(/^data:image\/svg\+xml;utf8,/, ""));
-                  let svgOnly = svgTextRaw.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || svgTextRaw;
-                  svgOnly = svgOnly.replace(/<metadata[\s\S]*?<\/metadata>/i, "");
-                  navigator.clipboard.writeText(svgOnly);
-                }}
-                disabled={!svgImage}
-                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
-                aria-label="Copy SVG"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
+
           </div>
         </div>
       </div>
@@ -750,6 +725,34 @@ export function Vectorizer() {
               <div className="flex items-center justify-center w-full h-full text-gray-500 text-lg">Download or copy the SVG paths</div>
             )}
           </Card>
+          {/* Step 4: Download/Copy - Mobile only, below SVG output */}
+          <div className="block md:hidden mt-4 w-full">
+            <div className="flex items-center justify-center gap-2">
+              <span className="font-semibold text-base mr-2 whitespace-nowrap">Step 4:</span>
+              <Button
+                onClick={handleDownload}
+                disabled={!svgImage}
+                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
+                aria-label="Download SVG"
+              >
+                <FileDown className="w-4 h-4" />
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!svgImage) return;
+                  const svgTextRaw = decodeURIComponent(svgImage.replace(/^data:image\/svg\+xml;utf8,/, ""));
+                  let svgOnly = svgTextRaw.match(/<svg[\s\S]*?<\/svg>/i)?.[0] || svgTextRaw;
+                  svgOnly = svgOnly.replace(/<metadata[\s\S]*?<\/metadata>/i, "");
+                  navigator.clipboard.writeText(svgOnly);
+                }}
+                disabled={!svgImage}
+                className={`h-9 flex items-center gap-2 px-3 text-sm bg-black text-white hover:bg-gray-900 focus:ring-black ${!svgImage ? 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed hover:bg-gray-200 hover:text-gray-400' : ''}`}
+                aria-label="Copy SVG"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
       {/* Steps 1-4 in a row, now below the image/result cards, with wider container - Desktop only */}
