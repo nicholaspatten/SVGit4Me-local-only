@@ -1,6 +1,8 @@
 # Active Context
 
 ## Current Work Focus
+- **Mobile Backend Compatibility Achieved**: Full mobile device support with enhanced error handling and timeouts
+- **Cross-Platform SVG Conversion**: Desktop and mobile users now have equal conversion capabilities
 - **SVG Quality Issues Resolved**: Fixed black border lines and dimension matching issues in SVG output
 - **Image Preprocessing**: Implemented ImageMagick preprocessing to trim padding and ensure exact dimensions
 - **VTracer Integration**: Successfully integrated VTracer with proper binary installation and permissions
@@ -13,6 +15,12 @@
 - Providing clear download/copy guidance for SVG output
 
 ## Recent Changes
+- **Mobile Backend Compatibility**: Complete mobile device support with enhanced file validation, timeouts, and error handling
+- **Cross-Browser SVG Testing**: Implemented comprehensive cross-browser compatibility test page with touch interactions
+- **Mobile-Specific Timeouts**: Extended processing timeouts for mobile devices (90s vs 60s desktop)
+- **Enhanced File Validation**: Strict file type checking, size limits, and corruption detection for mobile uploads
+- **Docker Binary Verification**: Added startup checks for tool availability and permissions in containers
+- **Mobile Error Messages**: Targeted error feedback with actionable suggestions for mobile users
 - **SVG Black Lines Fixed**: Implemented comprehensive image preprocessing and SVG post-processing to eliminate black border artifacts
 - **Dimension Accuracy**: SVG output now matches original image dimensions exactly through ImageMagick preprocessing
 - **Image Preprocessing**: Added trim and repage operations to remove padding before vectorization
@@ -39,6 +47,10 @@
 - **Verify color vectorization** works correctly on deployed platform with VTracer-only approach.
 
 ## Active Decisions
+- **Mobile-First Backend**: Full mobile device compatibility with extended timeouts and enhanced error handling
+- **Cross-Platform Processing**: Equal conversion capabilities for desktop and mobile users
+- **Mobile File Limits**: 15MB size limit with strict validation for mobile browser compatibility
+- **Device-Specific Timeouts**: 90 seconds for mobile devices, 60 seconds for desktop processing
 - **Privacy-First Architecture**: Local Docker deployment is the primary and recommended deployment method
 - **Image Preprocessing**: All images are preprocessed with ImageMagick trim and repage for optimal vectorization
 - **VTracer-only for color**: Color vectorization uses VTracer exclusively for superior quality and color accuracy

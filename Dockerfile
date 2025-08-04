@@ -42,8 +42,13 @@ ENV NODE_ENV production
 # Uncomment the following line in case you want to disable telemetry during runtime.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Ensure vectorization tools are available
-RUN which vtracer && which potrace && which convert
+# Ensure vectorization tools are available and have proper permissions
+RUN which vtracer && which potrace && which magick \
+    && chmod +x /usr/local/bin/vtracer \
+    && ls -la /usr/local/bin/vtracer \
+    && vtracer --help | head -5 \
+    && magick -version | head -1 \
+    && potrace --help | head -1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

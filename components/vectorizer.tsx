@@ -319,9 +319,13 @@ export function Vectorizer() {
         console.log(`${key}:`, typeof value === 'object' ? `File(${value.constructor.name}, ${value.size} bytes)` : value);
       }
 
-      // Call backend API with longer timeout for mobile
+      // Call backend API with extended timeout for mobile devices
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const timeoutMs = isMobile ? 90000 : 60000; // 90 seconds for mobile, 60 for desktop
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      console.log(`Processing on ${isMobile ? 'mobile' : 'desktop'} device with ${timeoutMs/1000}s timeout`);
       
       const apiRes = await fetch("/api/vectorize", {
         method: "POST",
@@ -359,7 +363,9 @@ export function Vectorizer() {
       let errorMessage = "Failed to process image";
       
       if (err.name === 'AbortError') {
-        errorMessage = "Request timed out. Please try again.";
+        errorMessage = isMobile 
+          ? "Request timed out on mobile. Try reducing image size or using a simpler preset like 'Black & White'."
+          : "Request timed out. Please try again.";
       } else if (err.message) {
         errorMessage = err.message;
       }

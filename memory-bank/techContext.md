@@ -15,6 +15,10 @@
 - VTracer color precision must be clamped to [1,8] to avoid errors.
 - Uploaded images must be saved and accessible for CLI processing.
 - Backend must handle errors gracefully and return helpful messages to the frontend.
+- Mobile file uploads limited to 15MB for compatibility and performance.
+- Processing timeouts: 90 seconds for mobile devices, 60 seconds for desktop.
+- Binary executables must have proper permissions in Docker containers.
+- Mobile browsers require enhanced file validation and corruption detection.
 
 ## Dependencies
 - Next.js, React, Tailwind CSS

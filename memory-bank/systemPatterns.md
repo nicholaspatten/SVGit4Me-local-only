@@ -13,6 +13,9 @@
 - Error handling and logging at both backend and frontend.
 - Pan/zoom and robust tooltip logic are standard for both raster and SVG previews.
 - Download/copy controls are always present for SVG output.
+- Mobile-first backend design with device-specific timeout and validation patterns.
+- Cross-browser compatibility with enhanced file processing for mobile devices.
+- Touch gesture support for mobile pan/zoom interactions.
 
 ## Design Patterns
 - **Step-by-step UI**: Each major action (upload, preset, convert, download) is a clear step in the flow.
@@ -20,6 +23,9 @@
 - **Preset abstraction**: Presets encapsulate recommended settings for different image types.
 - **Backend abstraction**: Conversion logic is separated by backend, with a unified API interface.
 - **Pan/zoom abstraction**: Both raster and SVG previews use a consistent pan/zoom pattern with clamping and reset.
+- **Touch interaction pattern**: Mobile devices get native touch gestures with pinch-to-zoom support.
+- **Device-aware processing**: Different timeout and validation rules based on device type detection.
+- **Mobile-first error handling**: Enhanced error messages with actionable suggestions for mobile users.
 - **Tooltip abstraction**: Tooltips use timers to prevent flashing and improve usability.
 - **Download/copy controls**: Always visible for SVG output, with clear disabled states and tooltips.
 
