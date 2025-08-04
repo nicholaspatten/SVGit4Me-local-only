@@ -268,6 +268,20 @@ export function Vectorizer() {
     setError(null);
 
     try {
+      // Validate image data URL first
+      console.log("=== IMAGE DATA VALIDATION ===");
+      console.log("Image data length:", pngImage.length);
+      console.log("Data URL format valid:", pngImage.startsWith('data:image/'));
+      console.log("Has base64 marker:", pngImage.includes(';base64,'));
+      
+      if (!pngImage.startsWith('data:image/')) {
+        throw new Error("Invalid image data format - not a data URL");
+      }
+      
+      if (!pngImage.includes(';base64,')) {
+        throw new Error("Invalid image data format - not base64 encoded");
+      }
+      
       // Convert base64 data URL to Blob with better Safari/Firefox compatibility
       let blob: Blob;
       try {
@@ -298,8 +312,13 @@ export function Vectorizer() {
           blob = new Blob([byteArray], { type: mimeType });
           console.log("Successfully created blob via manual conversion, size:", blob.size, "type:", blob.type);
         } catch (manualError) {
-          console.error("Both fetch and manual conversion failed:", manualError);
-          throw new Error("Failed to convert image data");
+          console.error("=== BLOB CONVERSION FAILED ===");
+          console.error("Fetch error:", fetchError);
+          console.error("Manual conversion error:", manualError);
+          console.error("Original data URL length:", pngImage.length);
+          console.error("Data URL prefix:", pngImage.substring(0, 50));
+          console.error("User agent:", navigator.userAgent);
+          throw new Error(`Failed to convert image data - Fetch: ${fetchError?.message}, Manual: ${manualError?.message}`);
         }
       }
 
@@ -380,15 +399,33 @@ export function Vectorizer() {
       const svgText = await apiRes.text();
       setSvgImage(`data:image/svg+xml;utf8,${encodeURIComponent(svgText)}`);
     } catch (err: any) {
-      console.error("Processing error:", err);
+      console.error("=== PROCESSING ERROR DETAILS ===");
+      console.error("Error object:", err);
+      console.error("Error name:", err.name);
+      console.error("Error message:", err.message);
+      console.error("Error stack:", err.stack);
+      console.error("User agent:", navigator.userAgent);
+      console.error("Network info:", navigator.connection || "Not available");
+      
       let errorMessage = "Failed to process image";
       
       if (err.name === 'AbortError') {
         errorMessage = isMobile 
           ? "Request timed out on mobile. Try reducing image size or using a simpler preset like 'Black & White'."
           : "Request timed out. Please try again.";
+      } else if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
+        errorMessage = isMobile 
+          ? "Network error on mobile. Check your connection and try again."
+          : "Network error. Please check your connection.";
       } else if (err.message) {
-        errorMessage = err.message;
+        errorMessage = `${err.message} (${err.name || 'Unknown error'})`;
+      } else {
+        errorMessage = `Unknown error occurred (${err.name || typeof err})`;
+      }
+      
+      // Add detailed error for debugging in development
+      if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
+        errorMessage += ` [Debug: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}]`;
       }
       
       setError(errorMessage);
