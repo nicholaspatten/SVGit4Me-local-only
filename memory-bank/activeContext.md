@@ -15,12 +15,12 @@
 - Providing clear download/copy guidance for SVG output
 
 ## Recent Changes
-- **Mobile Backend Compatibility**: Complete mobile device support with enhanced file validation, timeouts, and error handling
+- **Backend Fix Applied**: Reverted breaking backend changes that interfered with conversion process
+- **Conversion Functionality Restored**: Removed overly strict validation and timeout logic that was blocking conversions
+- **Safe Mobile Logging**: Kept minimal mobile debugging without affecting core functionality
 - **Cross-Browser SVG Testing**: Implemented comprehensive cross-browser compatibility test page with touch interactions
-- **Mobile-Specific Timeouts**: Extended processing timeouts for mobile devices (90s vs 60s desktop)
-- **Enhanced File Validation**: Strict file type checking, size limits, and corruption detection for mobile uploads
+- **Frontend Mobile Support**: Extended processing timeouts for mobile devices (90s vs 60s desktop)
 - **Docker Binary Verification**: Added startup checks for tool availability and permissions in containers
-- **Mobile Error Messages**: Targeted error feedback with actionable suggestions for mobile users
 - **SVG Black Lines Fixed**: Implemented comprehensive image preprocessing and SVG post-processing to eliminate black border artifacts
 - **Dimension Accuracy**: SVG output now matches original image dimensions exactly through ImageMagick preprocessing
 - **Image Preprocessing**: Added trim and repage operations to remove padding before vectorization
@@ -47,10 +47,10 @@
 - **Verify color vectorization** works correctly on deployed platform with VTracer-only approach.
 
 ## Active Decisions
-- **Mobile-First Backend**: Full mobile device compatibility with extended timeouts and enhanced error handling
+- **Backend Stability Priority**: Core conversion functionality must never be compromised by optimizations
+- **Minimal Mobile Changes**: Mobile compatibility through frontend enhancements and safe logging only
 - **Cross-Platform Processing**: Equal conversion capabilities for desktop and mobile users
-- **Mobile File Limits**: 15MB size limit with strict validation for mobile browser compatibility
-- **Device-Specific Timeouts**: 90 seconds for mobile devices, 60 seconds for desktop processing
+- **Conservative Backend Approach**: Avoid complex timeout logic or validation that could interfere with processing
 - **Privacy-First Architecture**: Local Docker deployment is the primary and recommended deployment method
 - **Image Preprocessing**: All images are preprocessed with ImageMagick trim and repage for optimal vectorization
 - **VTracer-only for color**: Color vectorization uses VTracer exclusively for superior quality and color accuracy
@@ -61,4 +61,11 @@
 - **Native binaries preferred**: Avoid WebAssembly alternatives for superior performance and quality
 - **Step-by-step UI**: Clear, compact card layout with Radix UI components
 - **Pan/zoom functionality**: Consistent across both raster and SVG previews with reset controls
-- **Debug logging**: Comprehensive logging for troubleshooting and quality assurance 
+- **Debug logging**: Comprehensive logging for troubleshooting and quality assurance
+
+## Lessons Learned
+- **Backend Changes Risk**: Mobile compatibility attempts with strict file validation, corruption detection, and complex timeout logic broke core conversion functionality
+- **Testing Critical**: All backend changes affecting core processing must be thoroughly tested before deployment
+- **Conservative Approach**: Frontend-only mobile improvements are safer than backend modifications
+- **Minimal Logging**: Mobile debugging should use only safe logging without affecting processing logic
+- **User Feedback Important**: Immediate user feedback about broken functionality prevented extended downtime 
