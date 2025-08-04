@@ -80,66 +80,19 @@ export async function POST(request: NextRequest) {
       size: file.size
     });
 
-    // Enhanced mobile browser support with file size and type validation
-    console.log("=== MOBILE FILE PROCESSING ===");
-    console.log("User-Agent:", request.headers.get('user-agent'));
-    console.log("Content-Length:", request.headers.get('content-length'));
-    
-    // Check file size limits for mobile compatibility
-    const maxSizeBytes = 15 * 1024 * 1024; // 15MB limit for mobile
-    if (file.size > maxSizeBytes) {
-      console.error("File too large for mobile processing:", file.size);
-      return NextResponse.json({ 
-        error: "File too large for mobile processing", 
-        maxSize: "15MB",
-        actualSize: `${Math.round(file.size / 1024 / 1024)}MB`
-      }, { status: 413, headers });
-    }
-    
-    // Validate file type more strictly for mobile
-    const allowedTypes = [
-      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-      'image/webp', 'image/bmp', 'image/tiff'
-    ];
-    if (!allowedTypes.includes(file.type.toLowerCase())) {
-      console.error("Invalid file type for mobile:", file.type);
-      return NextResponse.json({ 
-        error: "Unsupported file type", 
-        supportedTypes: allowedTypes,
-        receivedType: file.type
-      }, { status: 400, headers });
-    }
-
     // Save uploaded file to a temp location with better mobile browser support
+    console.log("=== PROCESSING REQUEST ===");
+    console.log("User-Agent:", request.headers.get('user-agent'));
+    console.log("File size:", file.size, "bytes");
+    
     let buffer: Buffer;
     try {
-      console.log("Converting file to buffer...");
       const arrayBuffer = await file.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
       console.log("Successfully converted file to buffer, size:", buffer.length);
-      
-      // Additional validation for corrupted files (common on mobile)
-      if (buffer.length === 0) {
-        throw new Error("Empty file buffer");
-      }
-      
-      // Validate basic image header for common formats
-      const header = buffer.slice(0, 10);
-      const isPNG = header[0] === 0x89 && header[1] === 0x50;
-      const isJPEG = header[0] === 0xFF && header[1] === 0xD8;
-      const isGIF = header.toString('ascii', 0, 3) === 'GIF';
-      const isWebP = header.toString('ascii', 8, 12) === 'WEBP';
-      
-      if (!isPNG && !isJPEG && !isGIF && !isWebP) {
-        console.warn("File might be corrupted or unsupported format, but proceeding...");
-      }
-      
     } catch (error) {
       console.error("Failed to convert file to arrayBuffer:", error);
-      return NextResponse.json({ 
-        error: "Failed to process uploaded file", 
-        details: error instanceof Error ? error.message : String(error)
-      }, { status: 400, headers });
+      return NextResponse.json({ error: "Failed to process uploaded file" }, { status: 400, headers });
     }
 
     const tempDir = os.tmpdir();
@@ -179,57 +132,36 @@ export async function POST(request: NextRequest) {
       console.log("ImageMagick command:", magickCmd);
       
       await new Promise((resolve, reject) => {
-        const process = exec(magickCmd, { timeout: 45000 }, (error, stdout, stderr) => {
+        exec(magickCmd, (error, stdout, stderr) => {
           console.log("ImageMagick stdout:", stdout);
           console.log("ImageMagick stderr:", stderr);
           if (error) {
             console.error("ImageMagick failed:", error);
-            if (error.code === 'SIGTERM' || error.killed) {
-              reject(new Error("ImageMagick processing timed out (mobile)"));
-            } else {
-              reject(new Error(`ImageMagick failed: ${stderr || stdout || error.message}`));
-            }
+            reject(stderr || stdout || error);
           } else {
             console.log("ImageMagick completed successfully");
             resolve(true);
           }
         });
-        
-        // Additional timeout safety for mobile
-        setTimeout(() => {
-          if (process.killed === false) {
-            console.warn("Killing ImageMagick process due to mobile timeout");
-            process.kill('SIGTERM');
-          }
-        }, 40000);
       });
-      // Run Potrace with mobile-friendly timeout
+      // Run Potrace
       const potraceCmd = `potrace "${pbmPath}" -s -o "${outputPath}"`;
       console.log("Running Potrace command:", potraceCmd);
       await new Promise((resolve, reject) => {
-        const process = exec(potraceCmd, { timeout: 30000 }, (error, stdout, stderr) => {
-          if (error) {
-            console.error("Potrace error:", error);
-            console.error("Potrace stderr:", stderr);
-            console.error("Potrace stdout:", stdout);
-            if (error.code === 'SIGTERM' || error.killed) {
-              reject(new Error("Potrace processing timed out (mobile)"));
+        exec(
+          potraceCmd,
+          (error, stdout, stderr) => {
+            if (error) {
+              console.error("Potrace error:", error);
+              console.error("Potrace stderr:", stderr);
+              console.error("Potrace stdout:", stdout);
+              reject(stderr || stdout || error);
             } else {
-              reject(new Error(`Potrace failed: ${stderr || stdout || error.message}`));
+              console.log("Potrace completed successfully");
+              resolve(true);
             }
-          } else {
-            console.log("Potrace completed successfully");
-            resolve(true);
           }
-        });
-        
-        // Additional timeout safety for mobile
-        setTimeout(() => {
-          if (process.killed === false) {
-            console.warn("Killing Potrace process due to mobile timeout");
-            process.kill('SIGTERM');
-          }
-        }, 25000);
+        );
       });
       await fs.unlink(pbmPath);
     } else {
@@ -245,29 +177,17 @@ export async function POST(request: NextRequest) {
       console.log("ImageMagick preprocess command:", preprocessCmd);
       
       await new Promise((resolve, reject) => {
-        const process = exec(preprocessCmd, { timeout: 30000 }, (error, stdout, stderr) => {
+        exec(preprocessCmd, (error, stdout, stderr) => {
           console.log("ImageMagick preprocess stdout:", stdout);
           console.log("ImageMagick preprocess stderr:", stderr);
           if (error) {
             console.error("ImageMagick preprocess failed:", error);
-            if (error.code === 'SIGTERM' || error.killed) {
-              reject(new Error("ImageMagick preprocessing timed out (mobile)"));
-            } else {
-              reject(new Error(`ImageMagick preprocessing failed: ${stderr || stdout || error.message}`));
-            }
+            reject(stderr || stdout || error);
           } else {
             console.log("ImageMagick preprocess completed successfully");
             resolve(true);
           }
         });
-        
-        // Additional timeout safety for mobile
-        setTimeout(() => {
-          if (process.killed === false) {
-            console.warn("Killing ImageMagick preprocess due to mobile timeout");
-            process.kill('SIGTERM');
-          }
-        }, 25000);
       });
 
       // Use VTracer for all other presets (no fallback)
@@ -286,7 +206,7 @@ export async function POST(request: NextRequest) {
       console.log("Running VTracer command:", vtracerCmd);
       
       await new Promise((resolve, reject) => {
-        const process = exec(vtracerCmd, { timeout: 60000 }, (error, stdout, stderr) => {
+        exec(vtracerCmd, (error, stdout, stderr) => {
           console.log("VTracer stdout:", stdout);
           console.log("VTracer stderr:", stderr);
           if (error) {
@@ -295,24 +215,12 @@ export async function POST(request: NextRequest) {
             console.error("VTracer failed - Error:", error.message);
             console.error("VTracer stderr:", stderr);
             console.error("VTracer stdout:", stdout);
-            if (error.code === 'SIGTERM' || error.killed) {
-              reject(new Error("VTracer processing timed out (mobile) - try reducing image size or complexity"));
-            } else {
-              reject(new Error(`VTracer failed: ${stderr || stdout || error.message}`));
-            }
+            reject(stderr || stdout || error);
           } else {
             console.log("VTracer completed successfully");
             resolve(true);
           }
         });
-        
-        // Additional timeout safety for mobile
-        setTimeout(() => {
-          if (process.killed === false) {
-            console.warn("Killing VTracer process due to mobile timeout");
-            process.kill('SIGTERM');
-          }
-        }, 55000);
       });
     }
 
