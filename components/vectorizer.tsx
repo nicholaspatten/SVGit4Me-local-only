@@ -305,7 +305,11 @@ export function Vectorizer() {
 
       // Prepare FormData with better Safari compatibility
       const formData = new FormData();
-      formData.append("image", blob, "upload.png");
+      
+      // Safari requires specific filename and MIME type handling
+      const fileName = `upload_${Date.now()}.png`;
+      const blobWithType = new Blob([blob], { type: blob.type || 'image/png' });
+      formData.append("image", blobWithType, fileName);
       
       // Add all settings to FormData
       Object.entries(settings).forEach(([key, value]) => {
@@ -319,25 +323,42 @@ export function Vectorizer() {
         console.log(`${key}:`, typeof value === 'object' ? `File(${value.constructor.name}, ${value.size} bytes)` : value);
       }
 
-      // Call backend API with extended timeout for mobile devices
+      // Call backend API with extended timeout for mobile devices  
       const controller = new AbortController();
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const timeoutMs = isMobile ? 90000 : 60000; // 90 seconds for mobile, 60 for desktop
+      const userAgent = navigator.userAgent;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(userAgent);
+      const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent);
+      const timeoutMs = (isMobile || isSafari) ? 120000 : 60000; // 2 min for mobile/Safari, 1 min for others
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
       
-      console.log(`Processing on ${isMobile ? 'mobile' : 'desktop'} device with ${timeoutMs/1000}s timeout`);
+      console.log(`Processing on ${isMobile ? 'mobile' : 'desktop'} device${isSafari ? ' (Safari)' : ''} with ${timeoutMs/1000}s timeout`);
+      console.log("User Agent:", userAgent);
       
-      const apiRes = await fetch("/api/vectorize", {
+      // Safari-compatible fetch request with explicit headers
+      const fetchOptions: RequestInit = {
         method: "POST",
         body: formData,
         signal: controller.signal,
-      });
+      };
+      
+      // Don't set Content-Type header - let browser set it for FormData
+      // Safari can be sensitive to manually set Content-Type headers with FormData
+      
+      console.log("Making fetch request to /api/vectorize");
+      const apiRes = await fetch("/api/vectorize", fetchOptions);
       
       clearTimeout(timeoutId);
 
       if (!apiRes.ok) {
+        console.error("API request failed:", {
+          status: apiRes.status,
+          statusText: apiRes.statusText,
+          headers: Object.fromEntries(apiRes.headers.entries()),
+          userAgent: navigator.userAgent
+        });
+        
         const contentType = apiRes.headers.get("content-type");
-        let errorMessage = "Failed to convert image";
+        let errorMessage = `Failed to convert image (${apiRes.status}: ${apiRes.statusText})`;
         
         try {
           if (contentType && contentType.includes("application/json")) {
