@@ -932,13 +932,6 @@ export function Vectorizer() {
         </div>
       </div>
 
-      {/* How It Works Link */}
-      <div className="text-center mb-6">
-        <a href="/info" className="text-blue-600 hover:text-blue-800 underline text-sm">
-          📚 How does this work? Learn about the technology & privacy features →
-        </a>
-      </div>
-
       {/* Images section */}
       <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-4 px-4 md:px-0">
         <div className="flex flex-col items-center w-full">
@@ -1277,6 +1270,14 @@ export function Vectorizer() {
           )}
             </Card>
       )}
+
+      {/* How It Works Link */}
+      <div className="text-center mb-6">
+        <a href="/info" className="text-blue-600 hover:text-blue-800 underline text-sm">
+          📚 How does this work? Learn about the technology & privacy features →
+        </a>
+      </div>
+
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   )
