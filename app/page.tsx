@@ -3,6 +3,7 @@
 import { Vectorizer } from "@/components/vectorizer"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 function DeploymentBanner() {
   const [isLocalDeployment, setIsLocalDeployment] = useState(false);
