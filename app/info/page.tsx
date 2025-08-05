@@ -24,7 +24,7 @@ export default function HowItWorksPage() {
               <img src="/logo.svg" alt="SVG It 4 Me" className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">How SVGit4Me Works</h1>
-                <p className="text-sm md:text-base text-gray-600 truncate">Technical Deep Dive & Architecture Overview</p>
+                <p className="text-xs sm:text-sm md:text-base text-gray-600 truncate">Technical Deep Dive & Architecture Overview</p>
               </div>
             </div>
           </div>
@@ -53,14 +53,14 @@ export default function HowItWorksPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-green-700 pt-3">
-                <ul className="space-y-1 text-sm">
+                <ul className="space-y-1 text-xs sm:text-sm">
                   <li className="flex items-center gap-2">
                     <Shield className="h-3 w-3" />
-                    <strong>100% Local</strong>: Vectorization on your computer
+                    <strong>100% Local</strong>: On your computer
                   </li>
                   <li className="flex items-center gap-2">
                     <Shield className="h-3 w-3" />
-                    <strong>Zero Upload</strong>: Images never leave your machine
+                    <strong>Zero Upload</strong>: Images stay local
                   </li>
                   <li className="flex items-center gap-2">
                     <Shield className="h-3 w-3" />
@@ -84,22 +84,22 @@ export default function HowItWorksPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-orange-700 pt-3">
-                <ul className="space-y-1 text-sm">
+                <ul className="space-y-1 text-xs sm:text-sm">
                   <li className="flex items-center gap-2">
                     <Globe className="h-3 w-3" />
-                    <strong>Quick Demo</strong>: Testing without setup
+                    <strong>Quick Demo</strong>: Test without setup
                   </li>
                   <li className="flex items-center gap-2">
                     <Globe className="h-3 w-3" />
-                    <strong>Server Processing</strong>: Images processed on Railway
+                    <strong>Server Processing</strong>: Cloud hosted
                   </li>
                   <li className="flex items-center gap-2">
                     <Globe className="h-3 w-3" />
-                    <strong>Honest Labels</strong>: Clearly marked as "Demo Mode"
+                    <strong>Honest Labels</strong>: Marked as "Demo"
                   </li>
                   <li className="flex items-center gap-2">
                     <Globe className="h-3 w-3" />
-                    <strong>Educational</strong>: Shows functionality before install
+                    <strong>Educational</strong>: Try before install
                   </li>
                 </ul>
               </CardContent>
@@ -331,7 +331,7 @@ export default function HowItWorksPage() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-3">
-                  <p className="text-orange-700 text-sm">
+                  <p className="text-orange-700 text-xs sm:text-sm">
                     Perfect for:
                   </p>
                   <ul className="space-y-1 text-orange-700 text-xs">
@@ -375,7 +375,7 @@ export default function HowItWorksPage() {
               </Button>
             </Link>
           </div>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-xs sm:text-sm">
             Made with ❤️ for privacy-conscious users who demand quality results.
           </p>
         </div>

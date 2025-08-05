@@ -46,7 +46,7 @@ function DeploymentBanner() {
     return (
       <div className="text-center mb-4">
         <div className="inline-block bg-orange-50 border border-orange-200 px-3 py-1.5 rounded text-xs">
-          <span className="text-orange-700">🌐 Temporary Cloud Processing - Get local version on GitHub</span>
+          <span className="text-orange-700">🌐 Cloud Demo - Get Local on GitHub</span>
         </div>
       </div>
     )
