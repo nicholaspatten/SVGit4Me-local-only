@@ -30,19 +30,18 @@ export default function HowItWorksPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Architecture Overview */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Code className="h-8 w-8 text-blue-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Code className="h-6 w-6 text-blue-600" />
             Architecture Overview
           </h2>
-          <p className="text-lg text-gray-700 mb-8">
-            SVGit4Me is designed with <strong>privacy and security as core principles</strong>. 
-            The application uses a dual-deployment strategy that gives users control over their data privacy.
+          <p className="text-base text-gray-700 mb-6">
+            SVGit4Me uses a <strong>dual-deployment strategy</strong> for privacy control: local Docker (100% private) or cloud demo (quick testing).
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
             {/* Local Docker Deployment */}
             <Card className="border-green-200 bg-green-50">
               <CardHeader>
@@ -52,23 +51,23 @@ export default function HowItWorksPage() {
                   <Badge variant="secondary" className="bg-green-100 text-green-800">Recommended</Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-green-700">
-                <ul className="space-y-2">
+              <CardContent className="text-green-700 pt-3">
+                <ul className="space-y-1 text-sm">
                   <li className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    <strong>100% Local Processing</strong>: All vectorization happens on your computer
+                    <Shield className="h-3 w-3" />
+                    <strong>100% Local</strong>: Vectorization on your computer
                   </li>
                   <li className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    <strong>Zero Data Transmission</strong>: Images never leave your machine
+                    <Shield className="h-3 w-3" />
+                    <strong>Zero Upload</strong>: Images never leave your machine
                   </li>
                   <li className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    <strong>Complete Privacy</strong>: No external servers involved
+                    <Shield className="h-3 w-3" />
+                    <strong>Complete Privacy</strong>: No external servers
                   </li>
                   <li className="flex items-center gap-2">
-                    <Shield className="h-4 w-4" />
-                    <strong>Offline Capable</strong>: Works without internet after setup
+                    <Shield className="h-3 w-3" />
+                    <strong>Offline Capable</strong>: Works without internet
                   </li>
                 </ul>
               </CardContent>
@@ -83,23 +82,23 @@ export default function HowItWorksPage() {
                   <Badge variant="secondary" className="bg-orange-100 text-orange-800">Demo Only</Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-orange-700">
-                <ul className="space-y-2">
+              <CardContent className="text-orange-700 pt-3">
+                <ul className="space-y-1 text-sm">
                   <li className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <strong>Convenience Demo</strong>: Quick testing without setup
+                    <Globe className="h-3 w-3" />
+                    <strong>Quick Demo</strong>: Testing without setup
                   </li>
                   <li className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <strong>Server-Side Processing</strong>: Images processed on Railway
+                    <Globe className="h-3 w-3" />
+                    <strong>Server Processing</strong>: Images processed on Railway
                   </li>
                   <li className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <strong>Honest Labeling</strong>: Clearly marked as "Demo Mode"
+                    <Globe className="h-3 w-3" />
+                    <strong>Honest Labels</strong>: Clearly marked as "Demo Mode"
                   </li>
                   <li className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <strong>Educational Purpose</strong>: Shows functionality before local install
+                    <Globe className="h-3 w-3" />
+                    <strong>Educational</strong>: Shows functionality before install
                   </li>
                 </ul>
               </CardContent>
@@ -108,30 +107,29 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Technical Implementation */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Cpu className="h-8 w-8 text-purple-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Cpu className="h-6 w-6 text-purple-600" />
             Core Vectorization Engines
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
             {/* VTracer */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-purple-800">VTracer (Color Images)</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-purple-800 text-lg">VTracer (Color Images)</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-gray-700">
-                  <li><strong>Rust-based</strong>: High-performance vectorization engine</li>
-                  <li><strong>Color Accuracy</strong>: Superior color reproduction and gradients</li>
-                  <li><strong>Multiple Modes</strong>: Spline, polygon, and mixed vectorization</li>
-                  <li><strong>Quality Control</strong>: Configurable precision and filtering</li>
+              <CardContent className="pt-0">
+                <ul className="space-y-1 text-sm text-gray-700 mb-3">
+                  <li><strong>Rust-based</strong>: High-performance engine</li>
+                  <li><strong>Color Accuracy</strong>: Superior reproduction</li>
+                  <li><strong>Multiple Modes</strong>: Spline, polygon, mixed</li>
+                  <li><strong>Quality Control</strong>: Configurable precision</li>
                 </ul>
-                <div className="mt-4 bg-gray-100 p-3 rounded-lg">
-                  <code className="text-sm text-gray-800">
+                <div className="bg-gray-100 p-2 rounded text-xs">
+                  <code className="text-gray-800">
                     vtracer --input "image.png" --output "result.svg"<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;--colormode color --color_precision 6<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;--mode spline --corner_threshold 60
+                    &nbsp;&nbsp;--colormode color --color_precision 6
                   </code>
                 </div>
               </CardContent>
@@ -139,19 +137,19 @@ export default function HowItWorksPage() {
 
             {/* Potrace */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-purple-800">Potrace (Black & White)</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-purple-800 text-lg">Potrace (Black & White)</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-gray-700">
-                  <li><strong>Bitmap Tracing</strong>: Specialized for monochrome conversion</li>
-                  <li><strong>ImageMagick Preprocessing</strong>: Automatic optimization</li>
-                  <li><strong>Precise Curves</strong>: Mathematical curve fitting</li>
-                  <li><strong>Size Optimization</strong>: Minimal SVG file sizes</li>
+              <CardContent className="pt-0">
+                <ul className="space-y-1 text-sm text-gray-700 mb-3">
+                  <li><strong>Bitmap Tracing</strong>: Monochrome specialist</li>
+                  <li><strong>ImageMagick Prep</strong>: Auto optimization</li>
+                  <li><strong>Precise Curves</strong>: Mathematical fitting</li>
+                  <li><strong>Size Optimized</strong>: Minimal SVG files</li>
                 </ul>
-                <div className="mt-4 bg-gray-100 p-3 rounded-lg">
-                  <code className="text-sm text-gray-800">
-                    magick "image.png" -trim +repage -threshold 50% "prep.pbm"<br />
+                <div className="bg-gray-100 p-2 rounded text-xs">
+                  <code className="text-gray-800">
+                    magick "image.png" -threshold 50% "prep.pbm"<br />
                     potrace "prep.pbm" -s -o "result.svg"
                   </code>
                 </div>
@@ -161,19 +159,19 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Mobile Optimizations */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Smartphone className="h-8 w-8 text-blue-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Smartphone className="h-6 w-6 text-blue-600" />
             Mobile Optimizations
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-blue-800 text-lg">Intelligent Preprocessing</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-blue-800 text-base">Smart Preprocessing</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
                   <li>• Auto-resize: 800x800px max</li>
                   <li>• 400K pixel limit</li>
                   <li>• 0.8 compression quality</li>
@@ -183,28 +181,28 @@ export default function HowItWorksPage() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-blue-800 text-lg">Progressive Retry</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-blue-800 text-base">Progressive Retry</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
-                  <li>• Auto-retry with simpler settings</li>
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
+                  <li>• Auto-retry simpler settings</li>
                   <li>• Force B&W for reliability</li>
-                  <li>• Ultra-conservative parameters</li>
+                  <li>• Ultra-conservative params</li>
                   <li>• Aggressive filtering</li>
                 </ul>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-blue-800 text-lg">Extended Timeouts</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-blue-800 text-base">Extended Timeouts</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
-                  <li>• Desktop: 60 seconds</li>
-                  <li>• Mobile/Safari: 120 seconds</li>
-                  <li>• Mobile Retry: 180 seconds</li>
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
+                  <li>• Desktop: 60s</li>
+                  <li>• Mobile/Safari: 120s</li>
+                  <li>• Mobile Retry: 180s</li>
                   <li>• Slower connection support</li>
                 </ul>
               </CardContent>
@@ -213,34 +211,34 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Privacy & Security */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Shield className="h-8 w-8 text-green-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Shield className="h-6 w-6 text-green-600" />
             Privacy & Security Features
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             <Card className="border-green-200">
-              <CardHeader>
-                <CardTitle className="text-green-800">Local Docker Security</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-green-800 text-lg">Local Docker Security</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <div className="space-y-4">
+              <CardContent className="text-gray-700 pt-0">
+                <div className="space-y-3">
                   <div>
-                    <h4 className="font-semibold mb-2">Complete Data Isolation</h4>
-                    <div className="bg-gray-100 p-3 rounded text-sm">
+                    <h4 className="font-semibold mb-1 text-sm">Complete Data Isolation</h4>
+                    <div className="bg-gray-100 p-2 rounded text-xs">
                       <code>
-                        ports: ["3000:3000"] # Only local access<br />
-                        NEXT_TELEMETRY_DISABLED=1 # No telemetry
+                        ports: ["3000:3000"] # Local only<br />
+                        NEXT_TELEMETRY_DISABLED=1
                       </code>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Automatic Cleanup</h4>
-                    <ul className="text-sm space-y-1">
-                      <li>• Temporary files deleted immediately</li>
+                    <h4 className="font-semibold mb-1 text-sm">Auto Cleanup</h4>
+                    <ul className="text-xs space-y-0.5">
+                      <li>• Temp files deleted immediately</li>
                       <li>• No persistent storage</li>
-                      <li>• Memory clearing after processing</li>
+                      <li>• Memory cleared after processing</li>
                     </ul>
                   </div>
                 </div>
@@ -248,29 +246,29 @@ export default function HowItWorksPage() {
             </Card>
 
             <Card className="border-orange-200">
-              <CardHeader>
-                <CardTitle className="text-orange-800">Cloud Demo Safeguards</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-orange-800 text-lg">Cloud Demo Safeguards</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <div className="space-y-4">
+              <CardContent className="text-gray-700 pt-0">
+                <div className="space-y-3">
                   <div>
-                    <h4 className="font-semibold mb-2">Honest Disclosure</h4>
-                    <div className="bg-gray-100 p-3 rounded text-sm">
+                    <h4 className="font-semibold mb-1 text-sm">Honest Disclosure</h4>
+                    <div className="bg-gray-100 p-2 rounded text-xs">
                       <code>
-                        if (isLocalDeployment) &#123;<br />
-                        &nbsp;&nbsp;// Show: "🔒 100% Local Processing"<br />
+                        if (isLocal) &#123;<br />
+                        &nbsp;&nbsp;"🔒 Local Processing"<br />
                         &#125; else &#123;<br />
-                        &nbsp;&nbsp;// Show: "🌐 Demo Mode - Cloud Processing"<br />
+                        &nbsp;&nbsp;"🌐 Demo Mode"<br />
                         &#125;
                       </code>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-2">Temporary Processing</h4>
-                    <ul className="text-sm space-y-1">
-                      <li>• Files deleted immediately after processing</li>
-                      <li>• No permanent storage of user images</li>
-                      <li>• Ephemeral container processing</li>
+                    <h4 className="font-semibold mb-1 text-sm">Temporary Processing</h4>
+                    <ul className="text-xs space-y-0.5">
+                      <li>• Files deleted immediately</li>
+                      <li>• No permanent storage</li>
+                      <li>• Ephemeral containers</li>
                     </ul>
                   </div>
                 </div>
@@ -280,19 +278,19 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Technical Specifications */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Monitor className="h-8 w-8 text-indigo-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Monitor className="h-6 w-6 text-indigo-600" />
             Technical Specifications
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             <Card>
-              <CardHeader>
-                <CardTitle className="text-indigo-800 text-lg">Input Formats</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-indigo-800 text-base">Input Formats</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
                   <li>• PNG, JPG, JPEG</li>
                   <li>• GIF, WebP, BMP</li>
                   <li>• Maximum: 15MB</li>
@@ -302,11 +300,11 @@ export default function HowItWorksPage() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-indigo-800 text-lg">Output Quality</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-indigo-800 text-base">Output Quality</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
                   <li>• SVG 1.1 compliant</li>
                   <li>• 1-8 decimal precision</li>
                   <li>• Color, grayscale, binary</li>
@@ -316,11 +314,11 @@ export default function HowItWorksPage() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-indigo-800 text-lg">Performance</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-indigo-800 text-base">Performance</CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-700">
-                <ul className="space-y-1 text-sm">
+              <CardContent className="text-gray-700 pt-0">
+                <ul className="space-y-0.5 text-xs">
                   <li>• Simple logos: 1-3s</li>
                   <li>• Complex photos: 10-30s</li>
                   <li>• Large images: 30-60s</li>
@@ -332,72 +330,72 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Deployment Options */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-            <Zap className="h-8 w-8 text-yellow-600" />
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Zap className="h-6 w-6 text-yellow-600" />
             Getting Started
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             <Card className="border-green-200 bg-green-50">
-              <CardHeader>
-                <CardTitle className="text-green-800">Local Docker Setup (Recommended)</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-green-800 text-lg">Local Docker Setup (Recommended)</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm mb-4">
+              <CardContent className="pt-0">
+                <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs mb-3">
                   <div># Quick start</div>
                   <div>git clone https://github.com/nicholaspatten/SVGit4Me-local-only</div>
                   <div>cd SVGit4Me-local-only</div>
                   <div>docker compose up</div>
                   <div># Access at http://localhost:3000</div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-green-700">
-                    <Shield className="h-4 w-4" />
-                    100% local processing
+                <div className="grid grid-cols-2 gap-1 text-xs">
+                  <div className="flex items-center gap-1 text-green-700">
+                    <Shield className="h-3 w-3" />
+                    100% local
                   </div>
-                  <div className="flex items-center gap-2 text-green-700">
-                    <Shield className="h-4 w-4" />
+                  <div className="flex items-center gap-1 text-green-700">
+                    <Shield className="h-3 w-3" />
                     Complete privacy
                   </div>
-                  <div className="flex items-center gap-2 text-green-700">
-                    <Shield className="h-4 w-4" />
+                  <div className="flex items-center gap-1 text-green-700">
+                    <Shield className="h-3 w-3" />
                     Offline capable
                   </div>
-                  <div className="flex items-center gap-2 text-green-700">
-                    <Shield className="h-4 w-4" />
-                    Professional-grade results
+                  <div className="flex items-center gap-1 text-green-700">
+                    <Shield className="h-3 w-3" />
+                    Professional results
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="border-orange-200 bg-orange-50">
-              <CardHeader>
-                <CardTitle className="text-orange-800">Cloud Demo</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-orange-800 text-lg">Cloud Demo</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-orange-700">
-                    The cloud demo is perfect for:
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <p className="text-orange-700 text-sm">
+                    Perfect for:
                   </p>
-                  <ul className="space-y-2 text-orange-700">
-                    <li className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
+                  <ul className="space-y-1 text-orange-700 text-xs">
+                    <li className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
                       Showcasing functionality
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
+                    <li className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
                       Quick testing without setup
                     </li>
-                    <li className="flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
-                      Educational demonstrations
+                    <li className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" />
+                      Educational demos
                     </li>
                   </ul>
-                  <div className="bg-orange-100 border border-orange-200 p-3 rounded">
-                    <p className="text-orange-800 text-sm font-medium">
-                      ⚠️ Not recommended for sensitive images - processing happens on external servers
+                  <div className="bg-orange-100 border border-orange-200 p-2 rounded">
+                    <p className="text-orange-800 text-xs font-medium">
+                      ⚠️ Not for sensitive images - server processing
                     </p>
                   </div>
                 </div>
@@ -407,22 +405,22 @@ export default function HowItWorksPage() {
         </section>
 
         {/* Footer */}
-        <div className="border-t pt-8 text-center">
-          <div className="flex items-center justify-center gap-4 mb-4">
+        <div className="border-t pt-6 text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
             <Link href="https://github.com/nicholaspatten/SVGit4Me-local-only">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
                 <Github className="h-4 w-4" />
-                View on GitHub
+                GitHub
               </Button>
             </Link>
             <Link href="/">
-              <Button className="gap-2">
+              <Button size="sm" className="gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Try SVGit4Me
               </Button>
             </Link>
           </div>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm">
             Made with ❤️ for privacy-conscious users who demand quality results.
           </p>
         </div>
