@@ -1,4 +1,4 @@
-# <img src="public/logo.svg" alt="SVG It 4 Me Logo" width="120" style="vertical-align:middle;" />
+# <img src="public/logo-transparent-svg.svg" alt="SVG It 4 Me Logo" width="120" style="vertical-align:middle;" />
 
 **SVGit4Me** is a **privacy-first, local-only** web application for converting raster images (PNG, JPG, etc.) to high-quality SVGs. Built with security and privacy as core principles, it runs entirely in a Docker container on your local machine, ensuring your images never leave your computer and are never uploaded to any external servers.
 
