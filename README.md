@@ -104,8 +104,8 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🔧 Technical Details
 
 ### Vectorization Engines
-- **VTracer**: High-quality color vectorization with superior color accuracy
-- **Potrace**: Black & white vectorization with ImageMagick preprocessing
+- **VTracer**: High-quality color vectorization with superior color accuracy (MIT License)
+- **Potrace**: Black & white vectorization with ImageMagick preprocessing (GPL-2.0 License)
 - **Image Preprocessing**: Automatic trim and optimization for perfect dimension matching
 - **Quality Assurance**: Intelligent post-processing removes artifacts while preserving content
 
@@ -128,7 +128,15 @@ For public deployment, the application can be deployed to platforms like Railway
 **Note**: Cloud deployment is provided for convenience but goes against the privacy-first design principle of this application.
 
 ## License
-MIT
+
+**SVGit4Me**: MIT License
+
+**Third-Party Tools**: 
+- VTracer (MIT License) - Compatible
+- Potrace (GPL-2.0 License) - Used as external binary
+- ImageMagick (Apache-2.0 License) - Used as external binary
+
+All third-party tools are called as external processes, maintaining license compatibility.
 
 ---
 

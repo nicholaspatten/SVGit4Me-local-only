@@ -27,6 +27,7 @@ SVGit4Me is designed with **privacy and security as core principles**. The appli
 - **Color Accuracy**: Superior color reproduction and gradients
 - **Multiple Modes**: Spline, polygon, and mixed vectorization
 - **Quality Control**: Configurable precision and filtering parameters
+- **License**: MIT License
 
 ```bash
 # Example VTracer command generated
@@ -40,6 +41,7 @@ vtracer --input "image.png" --output "result.svg" \
 - **ImageMagick Preprocessing**: Automatic optimization and cleanup
 - **Precise Curves**: Mathematical curve fitting for clean lines
 - **Size Optimization**: Minimal SVG file sizes
+- **License**: GPL-2.0 License
 
 ```bash
 # Example processing pipeline
@@ -349,6 +351,16 @@ if (preset === "myCustomEngine") {
 - **Documentation**: README.md, API documentation
 - **Issues**: GitHub issue tracker
 - **Discussions**: GitHub discussions for questions
-- **License**: MIT (see LICENSE file)
+
+## 📋 Licensing
+
+**SVGit4Me Application**: MIT License (see LICENSE file)
+
+**Third-Party Dependencies**:
+- **VTracer**: MIT License - Compatible with our MIT license
+- **Potrace**: GPL-2.0 License - Used as external binary, no code linking
+- **ImageMagick**: Apache-2.0 License - Used as external binary
+
+**License Compatibility**: SVGit4Me calls these tools as external processes (CLI commands), which is permitted under their respective licenses without affecting our MIT licensing.
 
 Made with ❤️ for privacy-conscious users who demand quality results.
