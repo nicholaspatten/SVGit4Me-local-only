@@ -12,28 +12,29 @@ export default function HowItWorksPage() {
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2 self-start">
                 <ArrowLeft className="h-4 w-4" />
                 Back to App
               </Button>
             </Link>
             <div className="flex items-center gap-3">
-              <img src="/logo.svg" alt="SVG It 4 Me" className="w-12 h-12" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">How SVGit4Me Works</h1>
-                <p className="text-gray-600">Technical Deep Dive & Architecture Overview</p>
+              <img src="/logo.svg" alt="SVG It 4 Me" className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg md:text-2xl font-bold text-gray-900 truncate">How SVGit4Me Works</h1>
+                <p className="text-sm md:text-base text-gray-600 truncate">Technical Deep Dive & Architecture Overview</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 max-w-5xl">
+      <div className="container mx-auto px-4 py-6 max-w-5xl overflow-hidden">
         {/* Architecture Overview */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
             <Code className="h-6 w-6 text-blue-600" />
             Architecture Overview
           </h2>
@@ -108,7 +109,7 @@ export default function HowItWorksPage() {
 
         {/* Technical Implementation */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
             <Cpu className="h-6 w-6 text-purple-600" />
             Core Vectorization Engines
           </h2>
@@ -126,8 +127,8 @@ export default function HowItWorksPage() {
                   <li><strong>Multiple Modes</strong>: Spline, polygon, mixed</li>
                   <li><strong>Quality Control</strong>: Configurable precision</li>
                 </ul>
-                <div className="bg-gray-100 p-2 rounded text-xs">
-                  <code className="text-gray-800">
+                <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                  <code className="text-gray-800 whitespace-nowrap block">
                     vtracer --input "image.png" --output "result.svg"<br />
                     &nbsp;&nbsp;--colormode color --color_precision 6
                   </code>
@@ -147,8 +148,8 @@ export default function HowItWorksPage() {
                   <li><strong>Precise Curves</strong>: Mathematical fitting</li>
                   <li><strong>Size Optimized</strong>: Minimal SVG files</li>
                 </ul>
-                <div className="bg-gray-100 p-2 rounded text-xs">
-                  <code className="text-gray-800">
+                <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                  <code className="text-gray-800 whitespace-nowrap block">
                     magick "image.png" -threshold 50% "prep.pbm"<br />
                     potrace "prep.pbm" -s -o "result.svg"
                   </code>
@@ -162,12 +163,12 @@ export default function HowItWorksPage() {
 
         {/* Privacy & Security */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
             <Shield className="h-6 w-6 text-green-600" />
             Privacy & Security Features
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="border-green-200">
               <CardHeader className="pb-2">
                 <CardTitle className="text-green-800 text-lg">Local Docker Security</CardTitle>
@@ -176,8 +177,8 @@ export default function HowItWorksPage() {
                 <div className="space-y-3">
                   <div>
                     <h4 className="font-semibold mb-1 text-sm">Complete Data Isolation</h4>
-                    <div className="bg-gray-100 p-2 rounded text-xs">
-                      <code>
+                    <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                      <code className="text-gray-800 whitespace-nowrap block">
                         ports: ["3000:3000"] # Local only<br />
                         NEXT_TELEMETRY_DISABLED=1
                       </code>
@@ -203,8 +204,8 @@ export default function HowItWorksPage() {
                 <div className="space-y-3">
                   <div>
                     <h4 className="font-semibold mb-1 text-sm">Honest Disclosure</h4>
-                    <div className="bg-gray-100 p-2 rounded text-xs">
-                      <code>
+                    <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
+                      <code className="text-gray-800 whitespace-nowrap block">
                         if (isLocal) &#123;<br />
                         &nbsp;&nbsp;"🔒 Local Processing"<br />
                         &#125; else &#123;<br />
@@ -229,12 +230,12 @@ export default function HowItWorksPage() {
 
         {/* Technical Specifications */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
             <Monitor className="h-6 w-6 text-indigo-600" />
             Technical Specifications
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-indigo-800 text-base">Input Formats</CardTitle>
@@ -281,25 +282,25 @@ export default function HowItWorksPage() {
 
         {/* Deployment Options */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
             <Zap className="h-6 w-6 text-yellow-600" />
             Getting Started
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="border-green-200 bg-green-50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-green-800 text-lg">Local Docker Setup (Recommended)</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs mb-3">
+                <div className="bg-gray-900 text-green-400 p-3 rounded font-mono text-xs mb-3 overflow-x-auto">
                   <div># Quick start</div>
-                  <div>git clone https://github.com/nicholaspatten/SVGit4Me-local-only</div>
+                  <div className="whitespace-nowrap">git clone https://github.com/nicholaspatten/SVGit4Me-local-only</div>
                   <div>cd SVGit4Me-local-only</div>
                   <div>docker compose up</div>
                   <div># Access at http://localhost:3000</div>
                 </div>
-                <div className="grid grid-cols-2 gap-1 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
                   <div className="flex items-center gap-1 text-green-700">
                     <Shield className="h-3 w-3" />
                     100% local
@@ -356,15 +357,15 @@ export default function HowItWorksPage() {
 
         {/* Footer */}
         <div className="border-t pt-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-3">
             <Link href="https://github.com/nicholaspatten/SVGit4Me-local-only">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
                 <Github className="h-4 w-4" />
                 GitHub
               </Button>
             </Link>
             <Link href="/">
-              <Button size="sm" className="gap-2">
+              <Button size="sm" className="gap-2 w-full sm:w-auto">
                 <ArrowLeft className="h-4 w-4" />
                 Try SVGit4Me
               </Button>
