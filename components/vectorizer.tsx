@@ -440,8 +440,6 @@ export function Vectorizer() {
 
       // Call backend API with extended timeout for mobile devices  
       const controller = new AbortController();
-      const userAgent = navigator.userAgent;
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(userAgent);
       const isSafari = /Safari/i.test(userAgent) && !/Chrome/i.test(userAgent);
       const timeoutMs = (isMobile || isSafari) ? 120000 : 60000; // 2 min for mobile/Safari, 1 min for others
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
