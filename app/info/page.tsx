@@ -109,8 +109,8 @@ export default function HowItWorksPage() {
 
         {/* Technical Implementation */}
         <section className="mb-8">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
-            <Cpu className="h-6 w-6 text-purple-600" />
+          <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2 flex-wrap">
+            <Cpu className="h-5 w-5 text-purple-600" />
             Core Vectorization Engines
           </h2>
 
@@ -118,19 +118,20 @@ export default function HowItWorksPage() {
             {/* VTracer */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-purple-800 text-lg">VTracer (Color Images)</CardTitle>
+                <CardTitle className="text-purple-800 text-base">VTracer (Color)</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <ul className="space-y-1 text-sm text-gray-700 mb-3">
-                  <li><strong>Rust-based</strong>: High-performance engine</li>
-                  <li><strong>Color Accuracy</strong>: Superior reproduction</li>
-                  <li><strong>Multiple Modes</strong>: Spline, polygon, mixed</li>
-                  <li><strong>Quality Control</strong>: Configurable precision</li>
+                <ul className="space-y-0.5 text-xs text-gray-700 mb-2">
+                  <li><strong>Rust-based</strong>: High-performance</li>
+                  <li><strong>Color Accuracy</strong>: Superior quality</li>
+                  <li><strong>Multiple Modes</strong>: Spline, polygon</li>
+                  <li><strong>Quality Control</strong>: Configurable</li>
                 </ul>
-                <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                  <code className="text-gray-800 whitespace-nowrap block">
-                    vtracer --input "image.png" --output "result.svg"<br />
-                    &nbsp;&nbsp;--colormode color --color_precision 6
+                <div className="bg-gray-100 p-1.5 rounded overflow-x-auto">
+                  <code className="text-gray-800 text-xs block">
+                    vtracer --input "img.png"<br />
+                    --output "result.svg"<br />
+                    --colormode color
                   </code>
                 </div>
               </CardContent>
@@ -139,19 +140,21 @@ export default function HowItWorksPage() {
             {/* Potrace */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-purple-800 text-lg">Potrace (Black & White)</CardTitle>
+                <CardTitle className="text-purple-800 text-base">Potrace (B&W)</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <ul className="space-y-1 text-sm text-gray-700 mb-3">
+                <ul className="space-y-0.5 text-xs text-gray-700 mb-2">
                   <li><strong>Bitmap Tracing</strong>: Monochrome specialist</li>
                   <li><strong>ImageMagick Prep</strong>: Auto optimization</li>
                   <li><strong>Precise Curves</strong>: Mathematical fitting</li>
                   <li><strong>Size Optimized</strong>: Minimal SVG files</li>
                 </ul>
-                <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                  <code className="text-gray-800 whitespace-nowrap block">
-                    magick "image.png" -threshold 50% "prep.pbm"<br />
-                    potrace "prep.pbm" -s -o "result.svg"
+                <div className="bg-gray-100 p-1.5 rounded overflow-x-auto">
+                  <code className="text-gray-800 text-xs block">
+                    magick "img.png" -threshold<br />
+                    50% "prep.pbm"<br />
+                    potrace "prep.pbm" -s -o<br />
+                    "result.svg"
                   </code>
                 </div>
               </CardContent>
@@ -163,29 +166,30 @@ export default function HowItWorksPage() {
 
         {/* Privacy & Security */}
         <section className="mb-8">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
-            <Shield className="h-6 w-6 text-green-600" />
+          <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2 flex-wrap">
+            <Shield className="h-5 w-5 text-green-600" />
             Privacy & Security Features
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="border-green-200">
               <CardHeader className="pb-2">
-                <CardTitle className="text-green-800 text-lg">Local Docker Security</CardTitle>
+                <CardTitle className="text-green-800 text-base">Local Docker Security</CardTitle>
               </CardHeader>
               <CardContent className="text-gray-700 pt-0">
                 <div className="space-y-3">
                   <div>
-                    <h4 className="font-semibold mb-1 text-sm">Complete Data Isolation</h4>
-                    <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                      <code className="text-gray-800 whitespace-nowrap block">
-                        ports: ["3000:3000"] # Local only<br />
+                    <h4 className="font-semibold mb-1 text-xs">Complete Data Isolation</h4>
+                    <div className="bg-gray-100 p-1.5 rounded overflow-x-auto">
+                      <code className="text-gray-800 text-xs block">
+                        ports: ["3000:3000"]<br />
+                        # Local only<br />
                         NEXT_TELEMETRY_DISABLED=1
                       </code>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1 text-sm">Auto Cleanup</h4>
+                    <h4 className="font-semibold mb-1 text-xs">Auto Cleanup</h4>
                     <ul className="text-xs space-y-0.5">
                       <li>• Temp files deleted immediately</li>
                       <li>• No persistent storage</li>
@@ -198,24 +202,24 @@ export default function HowItWorksPage() {
 
             <Card className="border-orange-200">
               <CardHeader className="pb-2">
-                <CardTitle className="text-orange-800 text-lg">Cloud Demo Safeguards</CardTitle>
+                <CardTitle className="text-orange-800 text-base">Cloud Demo Safeguards</CardTitle>
               </CardHeader>
               <CardContent className="text-gray-700 pt-0">
                 <div className="space-y-3">
                   <div>
-                    <h4 className="font-semibold mb-1 text-sm">Honest Disclosure</h4>
-                    <div className="bg-gray-100 p-2 rounded text-xs overflow-x-auto">
-                      <code className="text-gray-800 whitespace-nowrap block">
+                    <h4 className="font-semibold mb-1 text-xs">Honest Disclosure</h4>
+                    <div className="bg-gray-100 p-1.5 rounded overflow-x-auto">
+                      <code className="text-gray-800 text-xs block">
                         if (isLocal) &#123;<br />
-                        &nbsp;&nbsp;"🔒 Local Processing"<br />
+                        &nbsp;&nbsp;"🔒 Local"<br />
                         &#125; else &#123;<br />
-                        &nbsp;&nbsp;"🌐 Demo Mode"<br />
+                        &nbsp;&nbsp;"🌐 Demo"<br />
                         &#125;
                       </code>
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1 text-sm">Temporary Processing</h4>
+                    <h4 className="font-semibold mb-1 text-xs">Temporary Processing</h4>
                     <ul className="text-xs space-y-0.5">
                       <li>• Files deleted immediately</li>
                       <li>• No permanent storage</li>
@@ -230,8 +234,8 @@ export default function HowItWorksPage() {
 
         {/* Technical Specifications */}
         <section className="mb-8">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 flex items-center gap-2 flex-wrap">
-            <Monitor className="h-6 w-6 text-indigo-600" />
+          <h2 className="text-lg md:text-xl font-bold mb-4 flex items-center gap-2 flex-wrap">
+            <Monitor className="h-5 w-5 text-indigo-600" />
             Technical Specifications
           </h2>
 
