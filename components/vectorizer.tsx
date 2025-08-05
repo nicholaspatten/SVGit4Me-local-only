@@ -1202,16 +1202,6 @@ export function Vectorizer() {
         </div>
       </div>
 
-      {/* Deployment Banner */}
-      <DeploymentBanner />
-
-      {/* How It Works Link */}
-      <div className="text-center mb-6">
-        <a href="/info" className="text-blue-600 hover:text-blue-800 underline text-sm">
-          📚 How does this work? Learn about the technology & privacy features →
-        </a>
-      </div>
-
       {/* Custom options UI below step cards if preset is custom */}
       {preset === "custom" && (
         <Card className="p-4 mb-4 w-[710px] mx-auto">
@@ -1337,6 +1327,16 @@ export function Vectorizer() {
           )}
             </Card>
       )}
+
+      {/* Deployment Banner */}
+      <DeploymentBanner />
+
+      {/* How It Works Link */}
+      <div className="text-center mb-6">
+        <a href="/info" className="text-blue-600 hover:text-blue-800 underline text-sm">
+          📚 How does this work? Learn about the technology & privacy features →
+        </a>
+      </div>
 
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
