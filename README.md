@@ -93,6 +93,13 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - `Dockerfile` - Container configuration for local deployment
 - `docker-compose.yml` - Docker Compose configuration
 - `deploy.sh` - Automated deployment script
+- `HOW-IT-WORKS.md` - Comprehensive technical documentation
+
+## 📚 Documentation
+
+- **[HOW-IT-WORKS.md](./HOW-IT-WORKS.md)** - Complete technical deep dive, architecture details, privacy explanations, and development guide
+- **README.md** (this file) - Quick start and overview
+- **memory-bank/** - Project context and decision documentation
 
 ## 🔧 Technical Details
 
