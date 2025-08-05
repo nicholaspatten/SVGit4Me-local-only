@@ -97,6 +97,7 @@ export function Vectorizer() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [wasmLoaded, setWasmLoaded] = useState(false)
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -177,6 +178,17 @@ export function Vectorizer() {
       }
     }
   }, [])
+
+  // Detect mobile device and enable optimizations
+  useEffect(() => {
+    const userAgent = navigator.userAgent;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(userAgent);
+    setIsMobileDevice(isMobile);
+    
+    if (isMobile) {
+      console.log("📱 Mobile device detected - optimizations enabled");
+    }
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -261,6 +273,52 @@ export function Vectorizer() {
     }
   };
 
+  // Mobile image preprocessing function
+  const preprocessImageForMobile = async (dataUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Mobile-specific size limits
+        const MAX_MOBILE_WIDTH = 800;
+        const MAX_MOBILE_HEIGHT = 800;
+        const MAX_MOBILE_PIXELS = 400000; // 400K pixels max
+        
+        let { width, height } = img;
+        const totalPixels = width * height;
+        
+        // Resize if too large for mobile
+        if (width > MAX_MOBILE_WIDTH || height > MAX_MOBILE_HEIGHT || totalPixels > MAX_MOBILE_PIXELS) {
+          const widthRatio = MAX_MOBILE_WIDTH / width;
+          const heightRatio = MAX_MOBILE_HEIGHT / height;
+          const pixelRatio = Math.sqrt(MAX_MOBILE_PIXELS / totalPixels);
+          const ratio = Math.min(widthRatio, heightRatio, pixelRatio);
+          
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
+          
+          console.log(`Mobile resize: ${img.width}x${img.height} → ${width}x${height}`);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Use lower quality for mobile to reduce file size
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Export with mobile-optimized quality (0.8 instead of default 0.92)
+        const mobileDataUrl = canvas.toDataURL('image/png', 0.8);
+        console.log(`Mobile optimization: ${dataUrl.length} → ${mobileDataUrl.length} bytes`);
+        resolve(mobileDataUrl);
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image for mobile preprocessing'));
+      img.src = dataUrl;
+    });
+  };
+
   const processImage = async () => {
     if (!pngImage) return;
 
@@ -268,17 +326,37 @@ export function Vectorizer() {
     setError(null);
 
     try {
-      // Validate image data URL first
-      console.log("=== IMAGE DATA VALIDATION ===");
-      console.log("Image data length:", pngImage.length);
-      console.log("Data URL format valid:", pngImage.startsWith('data:image/'));
-      console.log("Has base64 marker:", pngImage.includes(';base64,'));
+      // Detect mobile and preprocess image if needed
+      const userAgent = navigator.userAgent;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(userAgent);
       
-      if (!pngImage.startsWith('data:image/')) {
+      console.log("=== MOBILE PREPROCESSING ===");
+      console.log("Is mobile device:", isMobile);
+      console.log("Original image size:", pngImage.length, "bytes");
+      
+      // Use mobile-optimized image if on mobile device
+      let processedImage = pngImage;
+      if (isMobile) {
+        try {
+          processedImage = await preprocessImageForMobile(pngImage);
+          console.log("Mobile preprocessing successful");
+        } catch (mobileError) {
+          console.warn("Mobile preprocessing failed, using original:", mobileError);
+          // Continue with original image if preprocessing fails
+        }
+      }
+      
+      // Validate image data URL
+      console.log("=== IMAGE DATA VALIDATION ===");
+      console.log("Final image data length:", processedImage.length);
+      console.log("Data URL format valid:", processedImage.startsWith('data:image/'));
+      console.log("Has base64 marker:", processedImage.includes(';base64,'));
+      
+      if (!processedImage.startsWith('data:image/')) {
         throw new Error("Invalid image data format - not a data URL");
       }
       
-      if (!pngImage.includes(';base64,')) {
+      if (!processedImage.includes(';base64,')) {
         throw new Error("Invalid image data format - not base64 encoded");
       }
       
@@ -286,7 +364,7 @@ export function Vectorizer() {
       let blob: Blob;
       try {
         // Try fetch method first
-        const res = await fetch(pngImage);
+        const res = await fetch(processedImage);
         if (!res.ok) {
           throw new Error(`Fetch failed: ${res.status}`);
         }
@@ -296,8 +374,8 @@ export function Vectorizer() {
         console.log("Fetch method failed, trying manual conversion:", fetchError);
         try {
           // Fallback for Safari/Firefox: manual base64 to blob conversion
-          const base64Data = pngImage.split(',')[1];
-          const mimeType = pngImage.split(',')[0].split(':')[1].split(';')[0];
+          const base64Data = processedImage.split(',')[1];
+          const mimeType = processedImage.split(',')[0].split(':')[1].split(';')[0];
           
           if (!base64Data || !mimeType) {
             throw new Error("Invalid data URL format");
@@ -315,8 +393,8 @@ export function Vectorizer() {
           console.error("=== BLOB CONVERSION FAILED ===");
           console.error("Fetch error:", fetchError);
           console.error("Manual conversion error:", manualError);
-          console.error("Original data URL length:", pngImage.length);
-          console.error("Data URL prefix:", pngImage.substring(0, 50));
+          console.error("Original data URL length:", processedImage.length);
+          console.error("Data URL prefix:", processedImage.substring(0, 50));
           console.error("User agent:", navigator.userAgent);
           throw new Error(`Failed to convert image data - Fetch: ${fetchError?.message}, Manual: ${manualError?.message}`);
         }
@@ -330,11 +408,29 @@ export function Vectorizer() {
       const blobWithType = new Blob([blob], { type: blob.type || 'image/png' });
       formData.append("image", blobWithType, fileName);
       
-      // Add all settings to FormData
-      Object.entries(settings).forEach(([key, value]) => {
+      // Mobile-optimized settings
+      let mobileSettings = { ...settings };
+      let mobilePreset = preset;
+      
+      if (isMobile) {
+        // Use mobile-friendly settings for better success rate
+        mobileSettings = {
+          mode: "spline",
+          colorMode: preset === "bw" ? "binary" : "color",
+          colorPrecision: Math.min(4, Number(settings.colorPrecision) || 4), // Lower precision for mobile
+          cornerThreshold: Math.max(90, Number(settings.cornerThreshold) || 90), // Higher threshold = simpler
+          filterSpeckle: Math.max(4, Number(settings.filterSpeckle) || 4), // More aggressive filtering
+          spliceThreshold: Math.max(45, Number(settings.spliceThreshold) || 45), // Higher threshold
+        };
+        
+        console.log("Mobile-optimized settings:", mobileSettings);
+      }
+      
+      // Add settings to FormData
+      Object.entries(mobileSettings).forEach(([key, value]) => {
         formData.append(key, String(value));
       });
-      formData.append("preset", preset); // Send the current preset
+      formData.append("preset", mobilePreset);
       
       // Debug FormData
       console.log("FormData entries:");
@@ -398,6 +494,12 @@ export function Vectorizer() {
 
       const svgText = await apiRes.text();
       setSvgImage(`data:image/svg+xml;utf8,${encodeURIComponent(svgText)}`);
+      
+      // Mark mobile optimization task as completed
+      if (isMobile) {
+        console.log("✅ Mobile conversion successful!");
+      }
+      
     } catch (err: any) {
       console.error("=== PROCESSING ERROR DETAILS ===");
       console.error("Error object:", err);
@@ -407,11 +509,63 @@ export function Vectorizer() {
       console.error("User agent:", navigator.userAgent);
       console.error("Network info:", navigator.connection || "Not available");
       
+      // Mobile retry logic with progressive fallbacks
+      if (isMobile && !err.isRetry) {
+        console.log("🔄 Mobile conversion failed, trying with simpler settings...");
+        
+        try {
+          // Retry with ultra-simple mobile settings
+          const ultraSimpleSettings = {
+            mode: "spline",
+            colorMode: "binary", // Force black & white for reliability
+            colorPrecision: 2, // Minimum precision
+            cornerThreshold: 120, // Very high threshold
+            filterSpeckle: 8, // Aggressive filtering
+            spliceThreshold: 60,
+          };
+          
+          // Create new FormData with ultra-simple settings
+          const retryFormData = new FormData();
+          const retryFileName = `mobile_retry_${Date.now()}.png`;
+          const retryBlobWithType = new Blob([blob], { type: blob.type || 'image/png' });
+          retryFormData.append("image", retryBlobWithType, retryFileName);
+          
+          Object.entries(ultraSimpleSettings).forEach(([key, value]) => {
+            retryFormData.append(key, String(value));
+          });
+          retryFormData.append("preset", "bw"); // Force B&W preset for reliability
+          
+          console.log("Mobile retry with ultra-simple settings");
+          
+          const retryController = new AbortController();
+          const retryTimeoutId = setTimeout(() => retryController.abort(), 180000); // 3 minutes for retry
+          
+          const retryApiRes = await fetch("/api/vectorize", {
+            method: "POST",
+            body: retryFormData,
+            signal: retryController.signal,
+          });
+          
+          clearTimeout(retryTimeoutId);
+          
+          if (retryApiRes.ok) {
+            const retrySvgText = await retryApiRes.text();
+            setSvgImage(`data:image/svg+xml;utf8,${encodeURIComponent(retrySvgText)}`);
+            console.log("✅ Mobile retry conversion successful!");
+            setIsProcessing(false);
+            return; // Success! Exit early
+          }
+        } catch (retryErr) {
+          console.error("Mobile retry also failed:", retryErr);
+          // Continue to show original error
+        }
+      }
+      
       let errorMessage = "Failed to process image";
       
       if (err.name === 'AbortError') {
         errorMessage = isMobile 
-          ? "Request timed out on mobile. Try reducing image size or using a simpler preset like 'Black & White'."
+          ? "Request timed out on mobile. Try a smaller image or check your connection."
           : "Request timed out. Please try again.";
       } else if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
         errorMessage = isMobile 
@@ -423,9 +577,9 @@ export function Vectorizer() {
         errorMessage = `Unknown error occurred (${err.name || typeof err})`;
       }
       
-      // Add detailed error for debugging in development
-      if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
-        errorMessage += ` [Debug: ${JSON.stringify(err, Object.getOwnPropertyNames(err))}]`;
+      // Add helpful mobile tip
+      if (isMobile) {
+        errorMessage += " [Mobile Tip: Try a smaller image or switch to 'Black & White' preset]";
       }
       
       setError(errorMessage);
@@ -731,6 +885,11 @@ export function Vectorizer() {
               >
                 Select
               </Button>
+              {isMobileDevice && (
+                <div className="ml-2 text-xs bg-blue-50 border border-blue-200 px-2 py-1 rounded">
+                  📱 Mobile optimizations enabled: Auto-resize, simplified settings & retry logic
+                </div>
+              )}
               {error && <p className="text-red-500 ml-2 text-sm">{error}</p>}
             </div>
             {/* Step 2: Presets */}
