@@ -46,11 +46,7 @@ function DeploymentBanner() {
     return (
       <div className="text-center mb-4">
         <div className="inline-block bg-orange-50 border border-orange-200 px-3 py-1.5 rounded text-xs">
-          <span className="text-orange-700">🌐 Demo Mode</span>
-          <span className="text-gray-600 mx-2">•</span>
-          <a href="https://github.com/nicholaspatten/SVGit4Me-local-only" className="text-blue-600 hover:text-blue-800 underline">
-            Get local version
-          </a>
+          <span className="text-orange-700">🌐 Temporary Cloud Processing - Get local version on GitHub</span>
         </div>
       </div>
     )
