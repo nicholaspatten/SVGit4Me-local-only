@@ -80,7 +80,7 @@ export default function HowItWorksPage() {
                 <CardTitle className="flex items-center gap-2 text-orange-800">
                   <Globe className="h-5 w-5" />
                   Cloud Demo Deployment
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">Demo Only</Badge>
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-800 whitespace-nowrap">Demo Only</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-orange-700 pt-3">
