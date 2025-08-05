@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Github, Lock, Globe, Zap, Shield, Code, Cpu, Smartphone, Monitor } from "lucide-react"
+import { ArrowLeft, Github, Lock, Globe, Zap, Shield, Code, Cpu, Monitor } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -158,57 +158,7 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        {/* Mobile Optimizations */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <Smartphone className="h-6 w-6 text-blue-600" />
-            Mobile Optimizations
-          </h2>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-blue-800 text-base">Smart Preprocessing</CardTitle>
-              </CardHeader>
-              <CardContent className="text-gray-700 pt-0">
-                <ul className="space-y-0.5 text-xs">
-                  <li>• Auto-resize: 800x800px max</li>
-                  <li>• 400K pixel limit</li>
-                  <li>• 0.8 compression quality</li>
-                  <li>• Memory management</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-blue-800 text-base">Progressive Retry</CardTitle>
-              </CardHeader>
-              <CardContent className="text-gray-700 pt-0">
-                <ul className="space-y-0.5 text-xs">
-                  <li>• Auto-retry simpler settings</li>
-                  <li>• Force B&W for reliability</li>
-                  <li>• Ultra-conservative params</li>
-                  <li>• Aggressive filtering</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-blue-800 text-base">Extended Timeouts</CardTitle>
-              </CardHeader>
-              <CardContent className="text-gray-700 pt-0">
-                <ul className="space-y-0.5 text-xs">
-                  <li>• Desktop: 60s</li>
-                  <li>• Mobile/Safari: 120s</li>
-                  <li>• Mobile Retry: 180s</li>
-                  <li>• Slower connection support</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
 
         {/* Privacy & Security */}
         <section className="mb-8">
@@ -322,7 +272,7 @@ export default function HowItWorksPage() {
                   <li>• Simple logos: 1-3s</li>
                   <li>• Complex photos: 10-30s</li>
                   <li>• Large images: 30-60s</li>
-                  <li>• Mobile: +50% time</li>
+                  <li>• Desktop optimized</li>
                 </ul>
               </CardContent>
             </Card>

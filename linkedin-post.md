@@ -7,7 +7,7 @@ Tired of uploading your valuable images to unknown servers for vectorization? I 
 **🏠 What makes it different?**
 ✅ **Two ways to use**: Local Docker (100% private) OR cloud demo (quick testing)
 ✅ **Professional engines**: VTracer (Rust-based) + Potrace for different image types
-✅ **Mobile optimized**: Auto-resize, progressive retry, extended timeouts
+✅ **Desktop optimized**: Best performance and reliability on desktop browsers
 ✅ **Zero vendor lock-in**: Open source, runs anywhere
 
 **⚡ Why this approach matters:**
@@ -24,15 +24,14 @@ Tired of uploading your valuable images to unknown servers for vectorization? I 
 
 **🔧 Technical highlights:**
 • **Input formats**: PNG, JPG, WebP, GIF, BMP (up to 15MB)
-• **Smart preprocessing**: Auto-optimization for mobile devices
+• **Smart preprocessing**: Optimized for desktop browsers
 • **Multiple modes**: Color precision, B&W tracing, custom settings
 • **Fast processing**: Simple logos 1-3s, complex images 10-60s
 
 **🚀 Two ways to get started:**
 
 **Option 1 - Try the demo instantly:**
-→ https://svgit4me.up.railway.app
-(Clearly marked as temporary cloud processing)
+→ https://www.svgit4me.com (temporary cloud processing)
 
 **Option 2 - Run locally for true privacy:**
 ```
