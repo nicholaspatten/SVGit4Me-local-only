@@ -183,7 +183,7 @@ if (isLocalDeployment) {
 
 ```bash
 # Quick start
-git clone https://github.com/yourusername/SVGit4Me-local-only
+git clone https://github.com/nicholaspatten/SVGit4Me-local-only
 cd SVGit4Me-local-only
 docker compose up
 # Access at http://localhost:3000
